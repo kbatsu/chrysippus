@@ -19,17 +19,20 @@ buckets: bug fixes, lexicon updates, and new personas.
 The canonical persona content lives in `rules/<persona>/`. The files at
 `.claude/skills/<persona>/`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/`,
 `.windsurfrules`, `CONVENTIONS.md`, and `.clinerules` are **generated** by
-`scripts/render.sh`. Do not edit them by hand — your changes will be
+`scripts/render.py`. Do not edit them by hand — your changes will be
 overwritten on the next render.
 
 After editing anything in `rules/`, run:
 
 ```bash
-scripts/render.sh
+scripts/render.py
 ```
 
-CI runs `scripts/check.sh` (which runs `render.sh --check`) and will fail your
-PR if generated files drift from source.
+CI runs `scripts/render.py --check` and will fail your PR if generated files
+drift from source.
+
+The generator is Python 3.8+ stdlib-only (no PyPI dependencies). To run it
+locally you need only a Python interpreter.
 
 ## Bug fixes
 
@@ -57,7 +60,7 @@ For each term:
 3. Include a `## Stereotype-drift guardrail` section in `instructions.md`
    listing what the persona must **never** do, with reasons.
 4. Add at least 5 worked before/after examples for completion summaries.
-5. Run `scripts/render.sh`, commit the regenerated outputs, add to CHANGELOG.
+5. Run `scripts/render.py`, commit the regenerated outputs, add to CHANGELOG.
 6. Update `README.md` with a demo block.
 
 ## Commit messages
@@ -68,7 +71,7 @@ Scope to a persona where applicable: `feat(pirate): add captain flavor`.
 
 ## Pull request checklist
 
-- [ ] `scripts/render.sh` run; generated files match source.
+- [ ] `scripts/render.py` run; generated files match source.
 - [ ] CHANGELOG updated under `## [Unreleased]`.
 - [ ] Tests added for new generator logic; existing tests still pass.
 - [ ] If adding a persona or flavor: README updated, demo added.

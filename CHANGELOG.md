@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(nothing yet)_
+### Added
+
+- `rules/<persona>/` source-of-truth directory holding canonical
+  `_meta.json` + `instructions.md` + `examples.md` for each persona.
+- `scripts/render.py` — Python 3 stdlib-only generator that walks `rules/`
+  and emits `.claude/skills/<persona>/{SKILL.md, <persona>.config, examples.md}`.
+- `scripts/render.py --check` — CI gate that fails on any drift between
+  generated output and committed `.claude/skills/` files.
+- `config_extra_notes` field in `_meta.json` for persona-specific warnings
+  in generated `.config` files (used by pirate's drunken-safety-warning combo).
+
+### Changed
+
+- `.claude/skills/shakespeare/{SKILL.md, shakespeare.config}` and
+  `.claude/skills/pirate/pirate.config` are now generated from `rules/`
+  rather than hand-edited. Behaviour unchanged; format normalised.
 
 ## [0.1.0] — 2026-04-17
 
