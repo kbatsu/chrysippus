@@ -1,0 +1,17 @@
+chrysippus
+Copyright (c) 2026 kbatsu and contributors
+
+This project is licensed under the MIT License (see LICENSE).
+
+Acknowledgements
+================
+
+The plugin / skill / marketplace pattern adopted here is inspired by
+caveman (https://github.com/JuliusBrussee/caveman), MIT-licensed.
+
+Built for use with Claude Code (https://claude.com/claude-code), an Anthropic
+product. "Claude" and "Anthropic" are trademarks of Anthropic.
+
+The persona registers shipped here are works of caricature, not authentic
+dialect. See each skill's instructions.md for register-specific guardrails
+and exclusions.

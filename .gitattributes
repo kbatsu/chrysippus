@@ -1,0 +1,26 @@
+# Force LF line endings everywhere — keeps render.sh output deterministic
+# across Windows / macOS / Linux contributors.
+* text=auto eol=lf
+
+# Lexicons accept community PRs frequently; union-merge avoids conflicts when
+# two PRs add unrelated entries.
+rules/*/lexicon.md merge=union
+
+# Markdown is the bulk of the repo; tell linguist to count it.
+*.md linguist-detectable=true
+
+# Generated files: still tracked (downstream installs depend on them) but
+# marked so GitHub shows them collapsed in diffs.
+.claude/skills/*/SKILL.md       linguist-generated=true
+.claude/skills/*/*.config       linguist-generated=true
+AGENTS.md                       linguist-generated=true
+GEMINI.md                       linguist-generated=true
+CONVENTIONS.md                  linguist-generated=true
+.windsurfrules                  linguist-generated=true
+.clinerules                     linguist-generated=true
+.cursor/rules/*.mdc             linguist-generated=true
+
+# Binaries (in case any creep in via demo GIFs)
+*.gif binary
+*.png binary
+*.jpg binary
