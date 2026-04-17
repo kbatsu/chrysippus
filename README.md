@@ -54,9 +54,28 @@ skills retune it.
 > *Hoist the colors, drink yer rum,*
 > *Cap'n's pleased — the work be done!"*
 
+### Gen-Alpha
+
+> **Plain Claude:**
+> *"I read the file. Found three TODOs. Want me to address them now?"*
+
+> **Gen-Alpha Claude (unhinged flavor):**
+> *"read the file. 3 TODOs in there. wild. want me to handle 'em rq?"*
+
+> **Gen-Alpha Claude (corporate flavor):**
+> *"Per my last review, three TODOs were located. The plan, lowkey, is to
+> ratify them — pending your call."*
+
+> **Gen-Alpha Claude (tutorial flavor — glosses on first use):**
+> *"read the file. 3 TODOs in there. wild. want me to handle 'em rq (= right
+> quick)?"*
+
+> *Made by Gen-Zs and millennials. Not endorsed by or representative of
+> actual Gen Alpha.*
+
 ## Sibling skills
 
-Both skills share the same architecture: a self-contained folder with
+All skills share the same architecture: a self-contained folder with
 `SKILL.md`, a `*.config` file for per-repo settings, and an `examples.md`
 corpus. They are installed and activated independently.
 
@@ -64,9 +83,10 @@ corpus. They are installed and activated independently.
 |---|---|---|---|
 | `shakespeare` | Early Modern English | `courtly` | `tavern`, `sonnet` |
 | `pirate` | 18c. maritime caricature | `scurvy-dog` | `captain`, `drunk`, `shanty` |
+| `gen-alpha` | internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
 
-If both are activated in the same session, the most recently invoked one
-wins — no fusion or blending.
+If more than one is activated in the same session, the most recently
+invoked one wins — no fusion or blending.
 
 ## Install
 
@@ -85,8 +105,11 @@ cp -r /path/to/shakespeare/.claude/skills/shakespeare .claude/skills/
 # just pirate
 cp -r /path/to/shakespeare/.claude/skills/pirate .claude/skills/
 
-# or both
-cp -r /path/to/shakespeare/.claude/skills/{shakespeare,pirate} .claude/skills/
+# just gen-alpha
+cp -r /path/to/shakespeare/.claude/skills/gen-alpha .claude/skills/
+
+# or all of them
+cp -r /path/to/shakespeare/.claude/skills/{shakespeare,pirate,gen-alpha} .claude/skills/
 ```
 
 Or as a git submodule, or by cloning this repo and symlinking — whichever
@@ -100,6 +123,7 @@ Copy the folder(s) into your personal Claude Code skills directory:
 mkdir -p ~/.claude/skills
 cp -r /path/to/shakespeare/.claude/skills/shakespeare ~/.claude/skills/
 cp -r /path/to/shakespeare/.claude/skills/pirate ~/.claude/skills/
+cp -r /path/to/shakespeare/.claude/skills/gen-alpha ~/.claude/skills/
 ```
 
 ## Activation
@@ -115,6 +139,8 @@ session and it loads and persists for the rest of the session:
   the Bard"*, *"thee and thou"*, `/shakespeare`, `/bard`.
 - **Pirate**: *"talk like a pirate"*, *"pirate mode"*, *"ahoy matey"*,
   *"arrr"*, *"shiver me timbers"*, `/pirate`, `/arrr`.
+- **Gen-Alpha**: *"talk like gen alpha"*, *"gen alpha mode"*, *"go
+  skibidi"*, *"skibidi mode"*, `/gen-alpha`, `/genalpha`.
 
 ### 2. Always-on via CLAUDE.md (recommended for dedicated repos)
 
@@ -149,6 +175,22 @@ for the remainder of the session. Read
 and preservation toggles. Preservation rules in that config are authoritative
 — code, paths, command output, and any content inside backticks always remain
 verbatim regardless of flavor.
+```
+
+**Gen-Alpha:**
+
+```markdown
+## Communication style
+
+This repo uses the `gen-alpha` skill at `.claude/skills/gen-alpha/SKILL.md`.
+Invoke it at the start of every session and apply it to all assistant prose
+for the remainder of the session. Read
+`.claude/skills/gen-alpha/gen-alpha.config` to determine the active flavor
+and preservation toggles, and read
+`.claude/skills/gen-alpha/lexicon.md` for the current vocabulary.
+Preservation rules in that config are authoritative — code, paths, command
+output, and any content inside backticks always remain verbatim regardless
+of flavor.
 ```
 
 For a user-global always-on, append the snippet to `~/.claude/CLAUDE.md`
@@ -186,29 +228,50 @@ preserve:
   commits: true
   pr_descriptions: true
   code_comments: true
-  safety_warnings: true  # strongly recommended: keep this true
+  safety_warnings: true  # strongly recommended on
   errors_verbatim: true
 ```
 
-Defaults favour shared-repo etiquette for both skills: every preservation
+### Gen-Alpha
+
+Edit `.claude/skills/gen-alpha/gen-alpha.config`:
+
+```yaml
+flavor: unhinged         # unhinged | corporate | tutorial
+
+preserve:
+  commits: true
+  pr_descriptions: true
+  code_comments: true
+  safety_warnings: true  # strongly recommended on
+  errors_verbatim: true
+```
+
+The lexicon at `.claude/skills/gen-alpha/lexicon.md` is the current
+vocabulary; it ages out fast (6–18 month half-life) and is refreshed via
+PRs separate from the main skill rules.
+
+Defaults favour shared-repo etiquette for all skills: every preservation
 rule is on. Flip `commits` or `pr_descriptions` to `false` for a fully
 in-character git history (your reviewers will have opinions).
 
-After editing either config mid-session, say *"reload shakespeare config"*
-or *"reload pirate config"* so Claude re-reads it. New sessions read
-configs automatically.
+After editing any config mid-session, say *"reload <skill> config"* so
+Claude re-reads it. New sessions read configs automatically.
 
 ## Mid-session controls
 
-Shared across both skills:
+Shared across all skills:
 
 - `"speak plainly"` / `"plain English"` — suspend the active skill for the
   next response only.
 - `"stop shakespeare"` / `"end bard mode"` — fully deactivate shakespeare.
 - `"stop pirate"` / `"end pirate mode"` — fully deactivate pirate.
+- `"stop gen alpha"` / `"end gen alpha"` — fully deactivate gen-alpha.
 - `"<flavor> flavor"` — switch flavor within the active skill (e.g.
-  `"tavern flavor"`, `"captain flavor"`, `"shanty flavor"`).
-- `"reload <skill> config"` — re-read the named skill's config after editing.
+  `"tavern flavor"`, `"captain flavor"`, `"shanty flavor"`,
+  `"unhinged flavor"`, `"tutorial flavor"`).
+- `"reload <skill> config"` / `"reload <skill> lexicon"` — re-read the
+  named skill's config or lexicon after editing.
 
 ## What stays plain English (always)
 
@@ -226,15 +289,26 @@ Shared across both skills:
 │   ├── SKILL.md            # the skill: register, flavors, preservation rules
 │   ├── shakespeare.config  # per-repo settings
 │   └── examples.md         # extended before/after corpus
-└── pirate/
+├── pirate/
+│   ├── SKILL.md
+│   ├── pirate.config
+│   └── examples.md
+└── gen-alpha/
     ├── SKILL.md
-    ├── pirate.config
-    └── examples.md
+    ├── gen-alpha.config
+    ├── examples.md
+    └── lexicon.md          # current vocabulary, refreshable
 ```
+
+The `.claude/skills/<persona>/` files are **generated** from canonical
+source at `rules/<persona>/` by `scripts/render.py`. To modify a skill,
+edit the `rules/` source and re-run `scripts/render.py`. See
+`CONTRIBUTING.md` for the workflow.
 
 ## Credits
 
 Pattern borrowed from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman).
 Voices borrowed from a man who has been dead 410 years and still writes
-better than most of us, and from a fictional register that never really
-existed but has outlived most that did.
+better than most of us; from a fictional register that never really existed
+but has outlived most that did; and from internet-meme culture, parodied by
+people too old to be representative of it.

@@ -1,0 +1,38 @@
+{
+  "name": "gen-alpha",
+  "version": "0.1.0",
+  "description": "Renders all assistant prose in internet-native ironic Gen-Alpha slang (skibidi, rizz, fanum tax, sigma, ohio, no cap, bussin, mid, gyatt, NPC, brainrot, cooked, lowkey/highkey) while leaving code, identifiers, file paths, command output, and any backtick-wrapped content verbatim. Supports three flavors: unhinged (default, max-density slang + sentence fragments + lowercase), corporate (slang inside formal/business prose for register-collision comedy), and tutorial (terms get parenthetical glosses on first use). Lexicon is in lexicon.md and refreshable. Preservation rules — commits, PR descriptions, code comments, safety warnings, error text — are individually configurable per repo via a sibling gen-alpha.config file. Self-aware disclaimer baked in: made by Gen-Zs and millennials, not endorsed by or representative of actual Gen Alpha. Activates and persists for the entire session whenever the user says \"talk like gen alpha\", \"gen alpha mode\", \"go skibidi\", \"skibidi mode\", invokes /gen-alpha or /genalpha, or whenever the repo's CLAUDE.md instructs always-on use of this skill. Use this skill any time the user wants Gen-Alpha, Gen-Z-internet, or ironic-slang prose styling, or any time it has been activated earlier in the session.",
+  "triggers": [
+    "talk like gen alpha",
+    "gen alpha mode",
+    "go skibidi",
+    "skibidi mode",
+    "/gen-alpha",
+    "/genalpha"
+  ],
+  "flavors": [
+    {
+      "name": "unhinged",
+      "description": "max-density slang, sentence fragments, lowercase",
+      "default": true
+    },
+    {
+      "name": "corporate",
+      "description": "slang in formal business prose (register-collision comedy)"
+    },
+    {
+      "name": "tutorial",
+      "description": "unhinged + parenthetical glosses on first use of each term"
+    }
+  ],
+  "preserve_defaults": {
+    "commits": true,
+    "pr_descriptions": true,
+    "code_comments": true,
+    "safety_warnings": true,
+    "errors_verbatim": true
+  },
+  "config_extra_notes": [
+    "Self-aware disclaimer baked into SKILL.md and surfaced by Claude in the README and marketplace listing: this skill is made by Gen-Zs and millennials, not endorsed by or representative of actual Gen Alpha. Defuses the 'how do you do, fellow kids' reading."
+  ]
+}

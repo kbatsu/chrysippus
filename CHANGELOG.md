@@ -7,22 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_(nothing yet)_
+
+## [0.2.0] — 2026-04-17
+
 ### Added
 
+- **`gen-alpha` persona skill** with three flavors: `unhinged` (default,
+  max-density slang + sentence fragments + lowercase), `corporate` (slang
+  in formal business prose for register-collision comedy), and `tutorial`
+  (parenthetical glosses on first use of each term per response).
+- `rules/gen-alpha/lexicon.md` — refreshable vocabulary file, separate
+  from instructions.md. Quarterly PR cadence.
+- Self-aware disclaimer baked into the `gen-alpha` skill: *"Made by Gen-Zs
+  and millennials. Not endorsed by or representative of actual Gen Alpha."*
 - `rules/<persona>/` source-of-truth directory holding canonical
   `_meta.json` + `instructions.md` + `examples.md` for each persona.
 - `scripts/render.py` — Python 3 stdlib-only generator that walks `rules/`
-  and emits `.claude/skills/<persona>/{SKILL.md, <persona>.config, examples.md}`.
+  and emits `.claude/skills/<persona>/{SKILL.md, <persona>.config, examples.md, [lexicon.md]}`.
 - `scripts/render.py --check` — CI gate that fails on any drift between
   generated output and committed `.claude/skills/` files.
 - `config_extra_notes` field in `_meta.json` for persona-specific warnings
-  in generated `.config` files (used by pirate's drunken-safety-warning combo).
+  in generated `.config` files (used by pirate's drunken-safety-warning
+  combo and gen-alpha's disclaimer).
 
 ### Changed
 
 - `.claude/skills/shakespeare/{SKILL.md, shakespeare.config}` and
   `.claude/skills/pirate/pirate.config` are now generated from `rules/`
   rather than hand-edited. Behaviour unchanged; format normalised.
+- README, CLAUDE.md, and CONTRIBUTING.md updated for the source-of-truth
+  pattern and the new `gen-alpha` skill.
 
 ## [0.1.0] — 2026-04-17
 
@@ -50,5 +65,6 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/kbatsu/chrysippus/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kbatsu/chrysippus/releases/tag/v0.1.0
