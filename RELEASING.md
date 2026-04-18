@@ -31,8 +31,9 @@ Maintainer-only checklist for cutting a release.
    jq '.version = "<version>"' .claude-plugin/plugin.json > .tmp && mv .tmp .claude-plugin/plugin.json
    ```
 6. **Eval suite passing** (manual trigger of `evals.yml` workflow on `main`).
-7. **`PLAN.md` reviewed** — anything completed since last release moved to
-   "shipped" notes or removed if absorbed into normal docs.
+7. **Unreleased CHANGELOG entries reviewed** — anything completed since
+   last release is captured in `## [Unreleased]` and ready to be promoted
+   to the new version heading.
 
 ## Cutting the release
 

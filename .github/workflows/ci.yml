@@ -58,7 +58,6 @@ jobs:
             CODE_OF_CONDUCT.md
             CHANGELOG.md
             RELEASING.md
-            PLAN.md
             docs/**/*.md
         continue-on-error: true
 

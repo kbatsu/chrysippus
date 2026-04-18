@@ -76,7 +76,6 @@ When editing any of these files in this repo:
 - `scripts/render.py`
 - `README.md`
 - `CLAUDE.md`
-- `PLAN.md`
 - `CHANGELOG.md`
 - `CONTRIBUTING.md`, `SECURITY.md`, `RELEASING.md`, etc.
 

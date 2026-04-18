@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_(nothing yet)_
+### Removed
+
+- `PLAN.md` — the durable execution roadmap added in `v0.1.0` and kept in
+  sync through each phase. Scope achieved with the `v1.0.0` release;
+  `CHANGELOG.md` is now the authoritative history. Any forward-looking
+  items are tracked as "Deferred to follow-up" entries in recent release
+  notes, or in GitHub issues.
+- References to `PLAN.md` cleaned up in `CLAUDE.md`, `RELEASING.md`,
+  `evals/README.md`, and `.github/workflows/ci.yml`.
 
 ## [1.0.0] — 2026-04-17 — first public release
 
@@ -98,9 +106,8 @@ before opening a PR.
   real-person refs, brand refs, gang-coded neighborhoods).
 
 **Eval runner is deferred** — the Python script that actually calls the
-Claude API to generate and grade outputs is tracked in `PLAN.md`'s
-open-follow-ups. Rubric format is locked in so the runner can be added
-without rubric churn.
+Claude API to generate and grade outputs is deferred (rubric format is
+locked in so the runner can be added without rubric churn).
 
 ### Changed
 
