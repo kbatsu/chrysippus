@@ -1,6 +1,6 @@
 # Personas
 
-Four personas ship with `chrysippus`. Each is a self-contained skill with
+Five personas ship with `chrysippus`. Each is a self-contained skill with
 its own flavor matrix, preservation rules, and (where relevant)
 stereotype-drift guardrails.
 
@@ -10,6 +10,7 @@ stereotype-drift guardrails.
 | [`pirate`](pirate.md) | Treasure Island / POTC 17–18c. maritime | `scurvy-dog` | `captain`, `drunk`, `shanty` |
 | [`gen-alpha`](gen-alpha.md) | Internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
 | [`toronto-mans`](toronto-mans.md) | Toronto / Multicultural-Toronto-English caricature | `mans` | *(single flavor in v1)* |
+| [`ontario-bud`](ontario-bud.md) | Rural-Ontario / Letterkenny-inspired caricature | `bud` | *(single flavor in v1)* |
 
 ## Shared behavior
 
