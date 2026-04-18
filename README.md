@@ -13,12 +13,13 @@ Portable persona skills for AI coding agents that change the register of
 the agent's prose while leaving code, file paths, command output, error
 text, and anything inside backticks verbatim.
 
-Four persona skills ship from this repo:
+Five persona skills ship from this repo:
 
 - **`shakespeare`** — Early Modern English (c. 1600, Bardic register).
 - **`pirate`** — Treasure Island / Pirates-of-the-Caribbean register.
 - **`gen-alpha`** — Internet-native ironic Gen-Alpha slang.
 - **`toronto-mans`** — Toronto / Multicultural-Toronto-English caricature.
+- **`ontario-bud`** — Rural-Ontario / Letterkenny-inspired caricature.
 
 Supported agents: **Claude Code** (first-class plugin), **Codex**, **Cline**,
 **Aider**, **Cursor**, **Windsurf**, **Gemini CLI**. Generated from a single

@@ -37,7 +37,7 @@ fi
 # Validate against allow-list. Reject anything else silently — the state
 # file is not a place for arbitrary input.
 case "${active}" in
-  shakespeare|pirate|gen-alpha|toronto-mans)
+  shakespeare|pirate|gen-alpha|toronto-mans|ontario-bud)
     ;;
   *)
     # Unknown persona name — log once to stderr and exit cleanly.

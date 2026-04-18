@@ -40,7 +40,8 @@ Available personas:
   shakespeare   Early Modern English (courtly / tavern / sonnet)
   pirate        Treasure Island / buccaneer (scurvy-dog / captain / drunk / shanty)
   gen-alpha     Internet-native ironic slang (unhinged / corporate / tutorial)
-  toronto-mans  Toronto / MTE caricature (mans)
+  toronto-mans          Toronto / MTE caricature (mans)
+  ontario-bud           Rural-Ontario / Letterkenny-inspired caricature (bud)
 
 State file: ${STATE_FILE}
 USAGE
@@ -52,7 +53,7 @@ if [[ $# -ne 1 ]]; then
 fi
 
 case "$1" in
-  shakespeare|pirate|gen-alpha|toronto-mans)
+  shakespeare|pirate|gen-alpha|toronto-mans|ontario-bud)
     mkdir -p "${STATE_DIR}"
     printf '%s\n' "$1" > "${STATE_FILE}"
     echo "${PROGNAME}: auto-activation enabled for persona '$1'"

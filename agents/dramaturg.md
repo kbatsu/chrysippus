@@ -1,7 +1,7 @@
 ---
 name: dramaturg
 description: Meta-agent that audits whether the currently-active persona skill's rules are being obeyed in the conversation. Use for self-debugging when a persona seems to be misbehaving, drifting, or violating its guardrails.
-skills: [shakespeare, pirate, gen-alpha, toronto-mans]
+skills: [shakespeare, pirate, gen-alpha, toronto-mans, ontario-bud]
 tools: Read
 ---
 
