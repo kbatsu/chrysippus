@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _(nothing yet)_
 
+## [0.5.0] — 2026-04-17
+
+### Added — multi-agent reach (Phase 5)
+
+The same canonical rules at `rules/<persona>/` are now rendered into
+formats for multiple AI coding agents beyond Claude Code. `scripts/render.py`
+emits all targets in a single pass; `--check` diffs every generated file.
+
+**New generated outputs**:
+- `AGENTS.md` — universal convention read by Codex, Cline, Aider, and
+  other agents that follow the `AGENTS.md` standard. Concatenates all
+  personas with activation cheat-sheet and full per-persona instructions.
+- `GEMINI.md` — for Gemini CLI. Same content as `AGENTS.md`; duplicated
+  rather than shimmed so Gemini doesn't need to follow a cross-reference.
+- `CONVENTIONS.md` — for Aider, as project conventions.
+- `.windsurfrules` — for Windsurf (Codeium).
+- `.clinerules` — for Cline.
+- `.cursor/rules/<persona>.mdc` — one MDC rule file per persona for
+  Cursor IDE. Includes Cursor-specific frontmatter (`description`,
+  `globs`, `alwaysApply`).
+
+Kiro IDE support deferred — marked `coming soon` in README pending a
+stable rule-format spec.
+
+### Changed
+
+- `scripts/render.py` extensively refactored to support multiple output
+  targets. Now emits 23 output files for 4 personas (up from 11).
+- `build_text_outputs` / `build_copy_outputs` separation introduced for
+  cleaner check/diff logic.
+- README, CLAUDE.md updated with multi-agent support table and extended
+  "generated files" list.
+
 ## [0.4.0] — 2026-04-17
 
 ### Changed — `toronto-mans` guardrails loosened for public release
@@ -150,7 +183,8 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/kbatsu/chrysippus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/kbatsu/chrysippus/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/kbatsu/chrysippus/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/kbatsu/chrysippus/compare/v0.1.0...v0.2.0

@@ -44,9 +44,17 @@ in the active skill's `SKILL.md` section 1.
 
 ## Working on the skills themselves
 
-**The `.claude/skills/<persona>/` files are generated.** Do not edit them
-directly — edit the canonical source at `rules/<persona>/` and re-run
-`scripts/render.py`.
+**The following files are all generated** by `scripts/render.py` from
+canonical source at `rules/<persona>/`:
+
+- `.claude/skills/<persona>/{SKILL.md, <persona>.config, examples.md, lexicon.md}`
+- `AGENTS.md`, `GEMINI.md`, `CONVENTIONS.md`
+- `.windsurfrules`, `.clinerules`
+- `.cursor/rules/<persona>.mdc`
+
+Do not edit any of these directly — edit the canonical source at
+`rules/<persona>/` and re-run `scripts/render.py`. `scripts/render.py --check`
+runs in CI and will fail PRs where generated files drift from source.
 
 When editing any of these files in this repo:
 

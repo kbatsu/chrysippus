@@ -351,6 +351,27 @@ Shared across all skills:
 - Slash command output and harness messages (those aren't Claude's prose anyway).
 - Replies in non-English languages — neither the Bard nor the buccaneer spoke anything else.
 
+## Multi-agent support
+
+As of `v0.5.0`, the same canonical rules at `rules/<persona>/` are rendered
+into formats for multiple AI coding agents. `scripts/render.py` emits all
+targets; `scripts/render.py --check` verifies no drift.
+
+| Agent | Generated file(s) | Status |
+|---|---|---|
+| Claude Code | `.claude/skills/<persona>/SKILL.md` + `<persona>.config` + `examples.md` + `lexicon.md` | ✅ |
+| Codex / Cline / Aider (AGENTS.md convention) | `AGENTS.md` | ✅ |
+| Gemini CLI | `GEMINI.md` | ✅ |
+| Aider (project conventions) | `CONVENTIONS.md` | ✅ |
+| Windsurf (Codeium) | `.windsurfrules` | ✅ |
+| Cline | `.clinerules` | ✅ |
+| Cursor IDE | `.cursor/rules/<persona>.mdc` | ✅ |
+| Kiro IDE | *(coming soon — awaiting stable spec)* | ⏳ |
+
+All multi-agent files are checked into the repo alongside the Claude Code
+skills. Downstream users get activation in their preferred agent without
+needing to regenerate anything.
+
 ## File layout
 
 ```
@@ -375,9 +396,21 @@ Shared across all skills:
     └── lexicon.md          # vocabulary w/ per-term provenance (MTE, Patois, AAVE)
 ```
 
-The `.claude/skills/<persona>/` files are **generated** from canonical
-source at `rules/<persona>/` by `scripts/render.py`. To modify a skill,
-edit the `rules/` source and re-run `scripts/render.py`. See
+At the repo root, generated multi-agent files also live alongside the
+Claude Code skills:
+
+```
+AGENTS.md              # universal (Codex, Cline, Aider, others)
+GEMINI.md              # Gemini CLI
+CONVENTIONS.md         # Aider project conventions
+.windsurfrules         # Windsurf (Codeium)
+.clinerules            # Cline
+.cursor/rules/<persona>.mdc  # Cursor IDE (one per persona)
+```
+
+All of the above **and** `.claude/skills/<persona>/` are **generated** from
+canonical source at `rules/<persona>/` by `scripts/render.py`. To modify a
+skill, edit the `rules/` source and re-run `scripts/render.py`. See
 `CONTRIBUTING.md` for the workflow.
 
 ## Credits
