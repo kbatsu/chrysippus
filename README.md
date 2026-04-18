@@ -41,6 +41,11 @@ claude plugin install chrysippus@kbatsu-plugins
 # then in any session: /chrysippus:shakespeare
 ```
 
+If you installed via the marketplace, `/chrysippus:personas` lists every
+persona and its flavors — handy when you forget what's available. Every
+persona activation also announces the active flavor, the other flavors,
+and how to switch/stop.
+
 **Other agents**: copy the generated file that your agent reads.
 
 ```bash

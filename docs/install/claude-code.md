@@ -84,6 +84,10 @@ SessionStart hook reads it and injects activation instructions.
 | `/chrysippus:toronto-mans` | Activate toronto-mans |
 | `/chrysippus:personas` | List installed personas; show which is active |
 
+Every persona activation also announces the active flavor, the other
+flavors, and how to switch/stop — so first-time users don't need to open
+the docs to discover what's available.
+
 The `:` between plugin and command is Claude Code's auto-namespacing —
 don't add more colons for sub-actions. Sub-actions (plain / reload /
 flavor switch) are natural-language triggers in the skill itself.
