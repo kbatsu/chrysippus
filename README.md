@@ -1,7 +1,7 @@
 # chrysippus
 
 [![CI](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml/badge.svg)](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/kbatsu/chrysippus?sort=semver)](https://github.com/kbatsu/chrysippus/releases/latest)
+[![Release](https://img.shields.io/github/v/tag/kbatsu/chrysippus?sort=semver&label=release)](https://github.com/kbatsu/chrysippus/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple)](https://kbatsu.github.io/chrysippus/)
 
