@@ -1,6 +1,6 @@
 {
   "name": "chrysippus",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Shakespeare, pirate, gen-alpha, and toronto-mans persona skills for Claude Code. Changes register (how Claude talks) without changing behavior — code, paths, commits, safety warnings, and errors stay plain English by default.",
   "author": {
     "name": "Eyram Dornor"

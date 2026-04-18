@@ -10,7 +10,7 @@
       "name": "chrysippus",
       "description": "Persona skills for Claude Code — shakespeare, pirate, gen-alpha, toronto-mans. Change register without changing behavior.",
       "source": "./",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "author": {
         "name": "Eyram Dornor"
       },
