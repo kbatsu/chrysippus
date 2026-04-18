@@ -112,7 +112,27 @@ invoked one wins — no fusion or blending.
 
 ## Install
 
-### Per-repo install (everyone working in this repo gets it)
+### Claude Code marketplace install (recommended for Claude Code users)
+
+Once `v0.6.0+` is published:
+
+```bash
+claude plugin marketplace add kbatsu/chrysippus
+claude plugin install chrysippus@chrysippus
+```
+
+This installs the plugin — all four personas, the slash commands, the
+reviewer subagents, and the SessionStart hook — into your user-global
+Claude Code settings. To enable auto-activation of a persona for a
+specific project:
+
+```bash
+cd your-project
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/activate.sh" shakespeare
+# (or: pirate / gen-alpha / toronto-mans / off / status)
+```
+
+### Per-repo install (copy the skill folders by hand)
 
 Copy the skill folder(s) you want into the target repo's
 `.claude/skills/`:
@@ -350,6 +370,56 @@ Shared across all skills:
 - Anything covered by an enabled `preserve.*` toggle in the active skill's config.
 - Slash command output and harness messages (those aren't Claude's prose anyway).
 - Replies in non-English languages — neither the Bard nor the buccaneer spoke anything else.
+
+## Slash commands (Claude Code plugin)
+
+When installed via the marketplace, `chrysippus` exposes these commands
+(auto-namespaced by Claude Code as `/chrysippus:<command>`):
+
+| Command | Effect |
+|---|---|
+| `/chrysippus:shakespeare` | Activate the shakespeare persona for the session |
+| `/chrysippus:pirate` | Activate the pirate persona |
+| `/chrysippus:gen-alpha` | Activate gen-alpha |
+| `/chrysippus:toronto-mans` | Activate toronto-mans (hard-lock on safety warnings) |
+| `/chrysippus:personas` | List installed personas and show which is active |
+
+Pass a flavor as an argument to switch flavor on activation:
+`/chrysippus:pirate shanty`.
+
+## Reviewer subagents
+
+Four per-persona code-review subagents, plus a meta "dramaturg":
+
+| Agent | Purpose |
+|---|---|
+| `shakespeare-reviewer` | PR review in Bardic register, substantive feedback |
+| `pirate-reviewer` | PR review in pirate register |
+| `gen-alpha-reviewer` | PR review in gen-alpha voice |
+| `toronto-mans-reviewer` | PR review in toronto-mans register |
+| `dramaturg` | Meta-agent: audits persona rule-adherence in a conversation; speaks plainly itself |
+
+Each reviewer declares the corresponding skill in its frontmatter, so the
+persona's full rules load automatically when the subagent runs.
+
+## SessionStart hook (opt-in auto-activation)
+
+`hooks/session-start.sh` reads `.claude/personas/active` in the project dir
+on every session start. If the file names a valid persona, the hook tells
+Claude to auto-activate it for the session.
+
+Enable for a project:
+
+```bash
+bash hooks/activate.sh shakespeare   # or pirate / gen-alpha / toronto-mans
+bash hooks/activate.sh status        # check current state
+bash hooks/activate.sh off           # disable
+```
+
+**Security**: the hook runs unsandboxed at your shell privilege (per Claude
+Code's hook model). It contains no network calls, no `eval`, and under
+100 lines; read it before running. See `SECURITY.md` for the full
+disclosure.
 
 ## Multi-agent support
 

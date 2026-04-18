@@ -9,6 +9,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _(nothing yet)_
 
+## [0.6.0] — 2026-04-17
+
+### Added — Claude Code distribution (Phase 6)
+
+Marketplace-installable plugin layer around the skills and multi-agent
+files. Users can install the full persona collection with two commands:
+
+```
+claude plugin marketplace add kbatsu/chrysippus
+claude plugin install chrysippus@chrysippus
+```
+
+**New files**:
+- `.claude-plugin/plugin.json` — plugin manifest (name, version, skills,
+  commands, agents, hooks paths).
+- `.claude-plugin/marketplace.json` — marketplace registration (owner,
+  plugin source = `kbatsu/chrysippus` on GitHub, version).
+- `commands/<persona>.md` — one slash command per persona, plus a repo-wide
+  `commands/personas.md` that lists installed personas. Auto-namespaced by
+  Claude Code as `/chrysippus:<persona>`. Flavor can be passed as an arg
+  (e.g., `/chrysippus:pirate shanty`). Sub-actions (*plain*, *reload*,
+  *flavor switch*) are natural-language triggers in the skill itself, not
+  separate commands — the Claude Code slash-command `:` is reserved for
+  plugin namespacing and cannot be user-extended for sub-commands.
+- `agents/<persona>-reviewer.md` (4 files) — per-persona PR review
+  subagents. Each declares `skills: [<persona>]` so the skill's rules
+  load automatically when the subagent runs (subagents do not inherit
+  parent-session skills per Claude Code spec).
+- `agents/dramaturg.md` — meta-agent that audits persona rule-adherence.
+  Declares all four personas in its `skills:` list so it can read any
+  of their rule sets. Speaks plainly (no persona voice).
+- `hooks/hooks.json` — declares the `SessionStart` hook.
+- `hooks/session-start.sh` — reads `.claude/personas/active` (if present)
+  and emits a persona auto-activation instruction. Allow-list validated;
+  no network calls; `set -euo pipefail`; under 100 LOC.
+- `hooks/activate.sh` — user-facing opt-in helper. Sets / clears the
+  per-project active-persona state file. Idempotent, allow-list validated,
+  no network calls.
+
+### Changed
+
+- README adds marketplace install section, slash-command table, reviewer
+  subagent table, and SessionStart hook documentation.
+- CLAUDE.md distinguishes generated files (under `rules/`-driven pipeline)
+  from hand-written plugin distribution files (`.claude-plugin/`,
+  `commands/`, `agents/`, `hooks/`).
+
+### Deferred to later phases
+
+- Per-session state (keying `.claude/personas/active-<session-id>`) — v1
+  uses a single file per project. Works for single-terminal flows; may
+  collide in multi-terminal use. Tracked as follow-up.
+- Claude Code SDK / MCP-server wrapper — out of scope.
+
 ## [0.5.0] — 2026-04-17
 
 ### Added — multi-agent reach (Phase 5)
@@ -183,7 +237,8 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/kbatsu/chrysippus/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/kbatsu/chrysippus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/kbatsu/chrysippus/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/kbatsu/chrysippus/compare/v0.2.0...v0.3.0

@@ -1,0 +1,27 @@
+{
+  "name": "chrysippus",
+  "version": "0.6.0",
+  "description": "Persona skills that change Claude Code's register without changing what code it writes. Ships shakespeare (Early Modern English), pirate (Treasure Island), gen-alpha (internet-native slang), and toronto-mans (Toronto/MTE caricature). Code, paths, commits, safety warnings, and errors stay in plain English by default — configurable per skill.",
+  "author": {
+    "name": "kbatsu"
+  },
+  "homepage": "https://github.com/kbatsu/chrysippus",
+  "repository": "https://github.com/kbatsu/chrysippus",
+  "license": "MIT",
+  "keywords": [
+    "persona",
+    "skill",
+    "style",
+    "register",
+    "shakespeare",
+    "pirate",
+    "gen-alpha",
+    "toronto-mans",
+    "prose",
+    "caricature"
+  ],
+  "skills": ".claude/skills/",
+  "commands": "commands/",
+  "agents": "agents/",
+  "hooks": "hooks/hooks.json"
+}

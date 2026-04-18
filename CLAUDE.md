@@ -56,6 +56,17 @@ Do not edit any of these directly — edit the canonical source at
 `rules/<persona>/` and re-run `scripts/render.py`. `scripts/render.py --check`
 runs in CI and will fail PRs where generated files drift from source.
 
+**Plugin distribution files** (`.claude-plugin/`, `commands/`, `agents/`,
+`hooks/`) are **hand-written**, not generated. Edit them directly. When a
+persona is added or renamed, update these files manually to match:
+
+- `.claude-plugin/plugin.json` — bump version, update description if scope changes
+- `commands/<persona>.md` — one per persona, activates the skill
+- `agents/<persona>-reviewer.md` — one per persona; must declare `skills: [<persona>]`
+- `agents/dramaturg.md` — must list all personas in `skills:`
+- `hooks/activate.sh` — allow-list in the `case` must include the persona
+- `hooks/session-start.sh` — allow-list in the `case` must include the persona
+
 When editing any of these files in this repo:
 
 - `rules/shakespeare/{_meta.json, instructions.md, examples.md}`

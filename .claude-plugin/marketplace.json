@@ -1,0 +1,23 @@
+{
+  "name": "chrysippus",
+  "owner": {
+    "name": "kbatsu",
+    "url": "https://github.com/kbatsu"
+  },
+  "plugins": [
+    {
+      "name": "chrysippus",
+      "source": {
+        "source": "github",
+        "repo": "kbatsu/chrysippus"
+      },
+      "description": "Persona skills for Claude Code — shakespeare, pirate, gen-alpha, toronto-mans. Change register without changing behavior.",
+      "version": "0.6.0",
+      "keywords": [
+        "persona",
+        "skill",
+        "style"
+      ]
+    }
+  ]
+}
