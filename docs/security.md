@@ -80,7 +80,7 @@ tag rather than `main`:
 
 ```bash
 # marketplace — pin to tag
-claude plugin install chrysippus@chrysippus --version v0.7.0
+claude plugin install chrysippus@kbatsu-plugins --version v1.0.2
 
 # tarball
 curl -LO "https://github.com/kbatsu/chrysippus/archive/refs/tags/v0.7.0.tar.gz"

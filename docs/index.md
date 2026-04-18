@@ -37,7 +37,7 @@ For Claude Code users:
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
-claude plugin install chrysippus@chrysippus
+claude plugin install chrysippus@kbatsu-plugins
 ```
 
 Then in any Claude Code session:

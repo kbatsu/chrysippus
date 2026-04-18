@@ -37,7 +37,7 @@ a smaller bill.
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
-claude plugin install chrysippus@chrysippus
+claude plugin install chrysippus@kbatsu-plugins
 # then in any session: /chrysippus:shakespeare
 ```
 
@@ -176,7 +176,7 @@ Available via the Claude Code marketplace:
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
-claude plugin install chrysippus@chrysippus
+claude plugin install chrysippus@kbatsu-plugins
 ```
 
 This installs the plugin — all four personas, the slash commands, the

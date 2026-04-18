@@ -7,7 +7,7 @@ marketplace install.
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
-claude plugin install chrysippus@chrysippus
+claude plugin install chrysippus@kbatsu-plugins
 ```
 
 Two commands. You now have:
