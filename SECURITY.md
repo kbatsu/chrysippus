@@ -7,8 +7,6 @@ issues.
 
 Preferred channel: open a [GitHub Security Advisory](https://github.com/kbatsu/chrysippus/security/advisories/new).
 
-Alternatively, email the maintainer (see `AUTHORS`).
-
 We aim to acknowledge reports within 7 days and to publish a fix or mitigation
 within 30 days for confirmed issues.
 
