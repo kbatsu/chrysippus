@@ -12,7 +12,7 @@
         "repo": "kbatsu/chrysippus"
       },
       "description": "Persona skills for Claude Code \u2014 shakespeare, pirate, gen-alpha, toronto-mans. Change register without changing behavior.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "keywords": [
         "persona",
         "skill",
