@@ -47,6 +47,9 @@ nav:
       - pirate: personas/pirate.md
       - gen-alpha: personas/gen-alpha.md
       - toronto-mans: personas/toronto-mans.md
+  - Configuration: configuration.md
+  - Subagents: subagents.md
+  - Recipes: recipes.md
   - Extending: extending.md
   - Security: security.md
 

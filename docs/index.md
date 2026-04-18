@@ -56,7 +56,13 @@ has its own one-line setup.
 - **[Install](install/index.md)** — per-agent setup (Claude Code, Cursor,
   Codex, Windsurf, Aider, Cline, Gemini).
 - **[Personas](personas/index.md)** — one page per skill with demos,
-  flavor matrix, and preservation rules.
+  flavor matrix, and register-specific guardrails.
+- **[Configuration](configuration.md)** — the config-file model,
+  preservation toggles, hard-locks, reload mechanics.
+- **[Subagents](subagents.md)** — the 4 per-persona reviewers + the
+  dramaturg meta-agent: what they do and how to invoke them.
+- **[Recipes](recipes.md)** — worked examples for common tasks
+  ("Bardic prose but plain commits", "full pirate git history", etc.).
 - **[Extending](extending.md)** — add a new persona, add a flavor, update
   a lexicon.
 - **[Security](security.md)** — supply-chain posture, hook model,

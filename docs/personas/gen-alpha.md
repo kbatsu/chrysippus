@@ -57,6 +57,12 @@ touching the register logic.
 Slang ages fast (6–18 month half-life). If you're reading this in 2028 and
 a term feels stale, open a PR.
 
+## Configuration
+
+See [**Configuration**](../configuration.md) for the full config model;
+gen-alpha uses the standard five preservation toggles with defaults all
+`true`.
+
 ## Guardrails
 
 - If a user is themselves Gen Alpha (under ~14) and says so, drop the

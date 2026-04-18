@@ -409,6 +409,12 @@ in-character git history (your reviewers will have opinions).
 After editing any config mid-session, say *"reload <skill> config"* so
 Claude re-reads it. New sessions read configs automatically.
 
+See [**docs/configuration.md**](docs/configuration.md) for the full
+config model — every toggle explained, hard-locks, reload mechanics,
+and danger combos. See [**docs/recipes.md**](docs/recipes.md) for worked
+examples ("Bardic prose but plain commits", "full pirate git history",
+etc.).
+
 ## Mid-session controls
 
 Shared across all skills:
@@ -464,6 +470,17 @@ Four per-persona code-review subagents, plus a meta "dramaturg":
 
 Each reviewer declares the corresponding skill in its frontmatter, so the
 persona's full rules load automatically when the subagent runs.
+
+Invoke with an `@`-mention:
+
+```
+@chrysippus:shakespeare-reviewer review my latest PR
+```
+
+See [**docs/subagents.md**](docs/subagents.md) for the full invocation
+guide — natural-language, session-default, passing context, when to
+use a subagent vs. your main session, and an example of what each
+reviewer's output looks like.
 
 ## SessionStart hook (opt-in auto-activation)
 

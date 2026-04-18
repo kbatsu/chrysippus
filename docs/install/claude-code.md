@@ -102,9 +102,17 @@ Five subagents are installed:
 - `dramaturg` — meta-agent that audits persona rule-adherence. Speaks
   plainly itself.
 
-Invoke via the standard Claude Code subagent mechanism. Each reviewer
-declares the corresponding skill in its frontmatter, so the persona
-context loads automatically when the subagent runs.
+Invoke with an `@`-mention (plugin-namespaced):
+
+```
+@chrysippus:shakespeare-reviewer review my latest PR
+@chrysippus:dramaturg audit this response for shakespeare adherence: "<paste>"
+```
+
+Each reviewer declares the corresponding skill in its frontmatter, so
+the persona context loads automatically. See
+[**Subagents**](../subagents.md) for the full invocation guide (natural-
+language, session defaults, passing context, and example output).
 
 ## Troubleshooting
 

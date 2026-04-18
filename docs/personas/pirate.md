@@ -58,6 +58,11 @@ Scurvy-dog during work; on task completion, appends a 4-line sea shanty
 >
 > *Cap'n's pleased — the work be done!*
 
+## Configuration
+
+See [**Configuration**](../configuration.md) for the full config model;
+the toggles below are the standard five with defaults all `true`.
+
 ## Danger combo
 
 `drunk` + `safety_warnings: false` in `pirate.config` is actively

@@ -66,13 +66,21 @@ the register has become:
 
 Full guardrail in [`rules/toronto-mans/instructions.md`](https://github.com/kbatsu/chrysippus/blob/main/rules/toronto-mans/instructions.md) §7.
 
+## Configuration
+
+See [**Configuration**](../configuration.md) for the full config model.
+Note the hard-lock below — toronto-mans is the one persona where a
+preservation toggle is not user-overridable.
+
 ## safety_warnings hard-locked
 
 `safety_warnings` in `toronto-mans.config` is **hard-locked to true** —
 the skill ignores any override that sets it false. Destructive-op
 confirmations and security warnings always render in plain English
 regardless of config. This is non-negotiable given the heightened
-sensitivity of the register.
+sensitivity of the register. See
+[Configuration → Hard-locks](../configuration.md#hard-locks) for the
+mechanism.
 
 ## If you're from a community this caricature touches
 
