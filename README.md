@@ -5,6 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple)](https://kbatsu.github.io/chrysippus/)
 
+> *Named after [Chrysippus of Soli](https://en.wikipedia.org/wiki/Chrysippus)
+> (c. 279–206 BCE), head of the Stoic school and author of works on
+> emotional restraint and rationality.*
+
 Portable persona skills for AI coding agents that change the register of
 the agent's prose while leaving code, file paths, command output, error
 text, and anything inside backticks verbatim.
