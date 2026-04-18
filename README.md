@@ -79,13 +79,19 @@ skills retune it.
 > *"I read the file. Found three TODOs. Want me to address them now?"*
 
 > **Toronto-mans Claude (mans flavor):**
-> *"Mans read the scroll. Three TODOs in there still. Drizzy energy on the
-> cleanup if you want me to handle 'em rq."*
+> *"Mans done read the scroll fam. 3 TODOs in there still, bare simple to
+> clean up no cap. Say the word and mandem will handle 'em."*
 
-> *This skill is a fictional caricature of a narrow Drake-era pop-cultural
-> register, not a representation of real Multicultural Toronto English. The
-> `safety_warnings` preservation toggle is hard-locked on and cannot be
-> disabled. See `.claude/skills/toronto-mans/SKILL.md` §7 for the full
+> *This skill is a fictional caricature, not a dialect. It borrows
+> substantially from **Multicultural Toronto English (MTE)**, **Jamaican
+> Patois**, and **African American Vernacular English (AAVE)** — none of
+> the vocabulary originated in Toronto. Per-term provenance is documented
+> in `.claude/skills/toronto-mans/lexicon.md`. The `safety_warnings`
+> preservation toggle is hard-locked on and cannot be disabled.
+> Excluded from the lexicon: fake-accent respellings of standard English
+> words, all Patois expletives, gang-coded neighborhood names, real-person
+> references (Drake, etc.), brand references (Tim Hortons, Raptors, etc.),
+> gang/drug/violence references, slurs. See `SKILL.md` §7 for the full
 > stereotype-drift guardrails.*
 
 ## Sibling skills
@@ -309,6 +315,10 @@ if the file says `false`, the skill treats it as `true`. This is
 intentional: the toronto-mans register's heightened sensitivity makes
 plain-English safety prompts non-negotiable.
 
+The lexicon at `.claude/skills/toronto-mans/lexicon.md` is the authoritative
+vocabulary, with per-term provenance tags. Do not pull Patois, MTE, or AAVE
+vocabulary from outside this lexicon — stay within the allowed surface.
+
 Defaults favour shared-repo etiquette for all skills: every preservation
 rule is on. Flip `commits` or `pr_descriptions` to `false` for a fully
 in-character git history (your reviewers will have opinions).
@@ -361,7 +371,8 @@ Shared across all skills:
 └── toronto-mans/
     ├── SKILL.md
     ├── toronto-mans.config
-    └── examples.md
+    ├── examples.md
+    └── lexicon.md          # vocabulary w/ per-term provenance (MTE, Patois, AAVE)
 ```
 
 The `.claude/skills/<persona>/` files are **generated** from canonical

@@ -53,7 +53,7 @@ When editing any of these files in this repo:
 - `rules/shakespeare/{_meta.json, instructions.md, examples.md}`
 - `rules/pirate/{_meta.json, instructions.md, examples.md}`
 - `rules/gen-alpha/{_meta.json, instructions.md, examples.md, lexicon.md}`
-- `rules/toronto-mans/{_meta.json, instructions.md, examples.md}`
+- `rules/toronto-mans/{_meta.json, instructions.md, examples.md, lexicon.md}`
 - `scripts/render.py`
 - `README.md`
 - `CLAUDE.md`

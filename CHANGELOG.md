@@ -9,6 +9,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _(nothing yet)_
 
+## [0.4.0] — 2026-04-17
+
+### Changed — `toronto-mans` guardrails loosened for public release
+
+The `toronto-mans` skill was shipped in v0.3.0 with a deliberately narrow
+lexicon that excluded Patois loanwords and AAVE markers entirely. That
+version felt evasive — a register called "toronto-mans" that excluded the
+vocabulary that makes Toronto-mans speech distinctive. This release
+loosens the lexicon to Level 3 (per the design discussion): full roadman
+vocabulary including Patois loanwords and AAVE markers, with strict
+guardrails held on the most contested territory.
+
+**Now allowed** (each tagged with provenance in `lexicon.md`):
+- **Patois loanwords** (origin: Jamaican Patois): wagwan, ting, yute,
+  gyal, mandem, bredren, peng, bare, nuff, par / parring.
+- **AAVE markers** (origin: African American Vernacular English): no cap,
+  bussin, finna, deadass, based, slaps, bet, W / L.
+
+**Newly excluded** (beyond what was already out):
+- **Real-person references**: Drake, Drizzy — removed from the lexicon
+  entirely. No putting words in real people's mouths.
+- **Brand references**: Tim Hortons, double-double, Toronto Raptors — all
+  removed. The register stands on vocabulary, not commercial touchstones.
+- **Specific gang-coded neighborhoods**: Jane and Finch, Jungle, Rexdale,
+  Regent Park, etc. — excluded for real-violence associations.
+
+**Held firm** (non-negotiable regardless of how loose the rest gets):
+- **All Patois expletives** (bumbaclot, bloodclaat, raasclaat, pussyclaat,
+  etc.) remain excluded.
+- **Fake-accent respellings** of standard English words remain excluded.
+  The line: borrowing the Patois word *ting* is allowed; respelling *think*
+  as *tink* is phonetic mockery of how a speaker sounds and is not.
+- **Slurs, gang/drug/violence references, claims of authenticity** all
+  remain excluded.
+- **`safety_warnings` hard-lock** on the config remains.
+
+### Added
+
+- `rules/toronto-mans/lexicon.md` — new authoritative vocabulary file with
+  per-term provenance tags (MTE / Patois / AAVE). Quarterly review cadence.
+- **Attribution paragraph** prominently in `instructions.md` naming MTE,
+  Jamaican Patois, broader Caribbean creoles, and AAVE as the sources the
+  register borrows from. Explicitly states this skill does not claim
+  ownership of the vocabulary or speak for those communities.
+- README disclaimer expanded to reflect the new attribution and the
+  exclusion of real-person / brand / gang-coded references.
+
+### Changed
+
+- `rules/toronto-mans/instructions.md` substantially rewritten for Level 3
+  scope — §3 style rules updated with new allowed vocabulary categories,
+  §6 examples rewritten, §7 stereotype-drift guardrail tightened to reflect
+  the new exclusions.
+- `rules/toronto-mans/examples.md` rewritten with new voice and updated
+  anti-examples (§K) — Patois expletives / fake accents / brand refs /
+  gang-coded neighborhoods / real-person mentions all appear in anti-examples.
+- `rules/toronto-mans/_meta.json` bumped to `version: 0.2.0` internally;
+  description rewritten to reflect new posture.
+
 ## [0.3.0] — 2026-04-17
 
 ### Added
@@ -91,7 +150,8 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/kbatsu/chrysippus/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/kbatsu/chrysippus/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/kbatsu/chrysippus/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kbatsu/chrysippus/releases/tag/v0.1.0
