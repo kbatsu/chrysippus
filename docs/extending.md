@@ -100,11 +100,12 @@ and updates `AGENTS.md` / `GEMINI.md` / `CONVENTIONS.md` / `.windsurfrules` /
 - Create `docs/personas/valley-girl.md`
 - Add rubric skeleton at `evals/rubrics/valley-girl.yml`
 
-### 6. Update CHANGELOG + tests
+### 6. Update tests
 
-- Add `## [Unreleased]` entry in `CHANGELOG.md`
 - Extend `tests/test_lexicon.py` with persona-specific assertions if the
-  register has guardrails that can be checked mechanically
+  register has guardrails that can be checked mechanically.
+- Use a Conventional Commit subject (`feat(<persona>): introduce …`) so
+  the next release tag's commit-log section reads cleanly.
 
 ### 7. Run CI locally
 
@@ -147,8 +148,6 @@ python3 scripts/render.py
 Update `README.md`, `docs/personas/shakespeare.md`, and `evals/rubrics/shakespeare.yml`
 if the new flavor has specific required/forbidden tokens.
 
-Add CHANGELOG entry under `## [Unreleased]`.
-
 ## Updating a lexicon
 
 Lexicons age out fast (esp. `gen-alpha` — 6–18 month half-life). Quarterly
@@ -162,8 +161,8 @@ term:
 - Include provenance in a parenthetical tag: `(origin: Jamaican Patois)`,
   `(origin: AAVE)`, etc.
 - Include a 1-line gloss usable by the `tutorial` flavor.
-- If removing a stale term, note it in the CHANGELOG with a brief reason
-  (*"ohio aged out, replaced by ..."*).
+- If removing a stale term, explain why in the PR description and commit
+  message (*"ohio aged out, replaced by ..."*).
 
 ### 2. Regenerate
 
@@ -179,7 +178,7 @@ If added terms are worth tracking as register markers, add them to
 `required_tokens`. If removed terms should be explicitly rejected, add to
 `forbidden_tokens`.
 
-### 4. CHANGELOG + PR
+### 4. PR
 
 `lexicon:` conventional-commit scope is conventional:
 

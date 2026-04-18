@@ -76,7 +76,6 @@ When editing any of these files in this repo:
 - `scripts/render.py`
 - `README.md`
 - `CLAUDE.md`
-- `CHANGELOG.md`
 - `CONTRIBUTING.md`, `SECURITY.md`, `RELEASING.md`, etc.
 
 …the active persona's register still applies to chat narration — but **all

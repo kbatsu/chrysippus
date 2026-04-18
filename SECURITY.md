@@ -61,6 +61,7 @@ plugin's source, do not install its hooks.
 When a confirmed vulnerability is fixed:
 
 1. Patch released on the `main` branch.
-2. New `v*` tag cut.
-3. Security advisory published on GitHub with credit (if desired) to the reporter.
-4. CHANGELOG entry under `### Security`.
+2. New `v*` tag cut, with the security context summarised in the tag
+   annotation message (the tag message is the GitHub Release body).
+3. Security advisory published on GitHub with credit (if desired) to the
+   reporter.

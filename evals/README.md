@@ -4,8 +4,7 @@ Harness for evaluating persona skill output against per-persona rubrics.
 
 **Status**: scaffold only. Rubrics are defined in `rubrics/`; the runner
 that actually calls the Claude API to generate and grade outputs is a
-deferred follow-up (tracked in `CHANGELOG.md` under the `v1.0.0` release
-notes / deferred-follow-ups list).
+deferred follow-up (tracked in GitHub issues).
 
 ## What evals are for
 

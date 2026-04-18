@@ -68,22 +68,5 @@ class TestMarketplaceJson(unittest.TestCase):
         self.assertIn("/", source.get("repo", ""), "repo should be 'owner/name'")
 
 
-class TestPluginManifestVsChangelog(unittest.TestCase):
-    def test_plugin_version_matches_top_changelog_entry(self):
-        manifest = json.loads((ROOT / ".claude-plugin" / "plugin.json").read_text())
-        changelog = (ROOT / "CHANGELOG.md").read_text()
-
-        # Find the first "## [X.Y.Z]" heading (after [Unreleased])
-        for line in changelog.splitlines():
-            if line.startswith("## [") and not line.startswith("## [Unreleased"):
-                tag = line.split("[", 1)[1].split("]", 1)[0]
-                self.assertEqual(
-                    manifest["version"], tag,
-                    f"plugin.json version={manifest['version']} but top CHANGELOG release is {tag}",
-                )
-                return
-        self.fail("no release entry found in CHANGELOG.md")
-
-
 if __name__ == "__main__":
     unittest.main()

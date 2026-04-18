@@ -31,14 +31,15 @@ scripts/render.py
 CI runs `scripts/render.py --check` and will fail your PR if generated files
 drift from source.
 
-The generator is Python 3.8+ stdlib-only (no PyPI dependencies). To run it
+The generator is Python 3.10+ stdlib-only (no PyPI dependencies). To run it
 locally you need only a Python interpreter.
 
 ## Bug fixes
 
 1. Open an issue describing the misbehavior with a transcript snippet.
-2. PR with the fix in `rules/<persona>/instructions.md`, regenerated outputs,
-   and a CHANGELOG entry under `## [Unreleased]`.
+2. PR with the fix in `rules/<persona>/instructions.md` and regenerated
+   outputs. Use a Conventional Commit subject (`fix(persona): …`) so
+   release notes are easy to assemble.
 
 ## Lexicon updates
 
@@ -49,8 +50,8 @@ For each term:
 
 - Add it under the appropriate category.
 - Include a 1-line gloss for use by the `tutorial` flavor.
-- If removing a stale term, note it in the CHANGELOG with a brief reason
-  ("ohio aged out, replaced by …").
+- If removing a stale term, explain why in the PR description and commit
+  message ("ohio aged out, replaced by …").
 
 ## Adding a new persona
 
@@ -60,7 +61,7 @@ For each term:
 3. Include a `## Stereotype-drift guardrail` section in `instructions.md`
    listing what the persona must **never** do, with reasons.
 4. Add at least 5 worked before/after examples for completion summaries.
-5. Run `scripts/render.py`, commit the regenerated outputs, add to CHANGELOG.
+5. Run `scripts/render.py` and commit the regenerated outputs.
 6. Update `README.md` with a demo block.
 
 ## Commit messages
@@ -83,7 +84,7 @@ Tests are Python 3 stdlib only — no PyPI deps needed.
 ## Pull request checklist
 
 - [ ] `scripts/render.py` run; generated files match source (CI gate: `scripts/render.py --check`).
-- [ ] CHANGELOG updated under `## [Unreleased]`.
+- [ ] PR title is a Conventional Commit (`feat:` / `fix:` / `docs:` / `chore:` / `lexicon:` …).
 - [ ] Tests added for new generator logic; existing tests still pass (`scripts/ci.sh`).
 - [ ] If adding a persona or flavor: README updated, demo added, rubric
       stub added at `evals/rubrics/<persona>.yml`.

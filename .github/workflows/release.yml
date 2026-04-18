@@ -33,25 +33,23 @@ jobs:
             exit 1
           fi
 
-      - name: Extract CHANGELOG section for this release
+      - name: Build release notes from tag annotation + commit log
         run: |
-          python3 <<'PY'
-          from pathlib import Path
-          import re
-          import sys
-          import os
-          version = os.environ["VERSION"]
-          text = Path("CHANGELOG.md").read_text()
-          # Find '## [<version>]' section; grab until next '## ['
-          pattern = re.compile(rf"## \[{re.escape(version)}\][^\n]*\n(.*?)(?=\n## \[|\Z)", re.DOTALL)
-          m = pattern.search(text)
-          if not m:
-              print(f"ERROR: no CHANGELOG entry found for {version}", file=sys.stderr)
-              raise SystemExit(2)
-          Path("release-notes.md").write_text(m.group(1).strip() + "\n")
-          PY
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
+          tag="${{ steps.version.outputs.tag }}"
+          {
+            # Annotated tag body (the -m message you pass to `git tag -a`)
+            git tag -l --format='%(contents:body)' "$tag" | sed '/^-----BEGIN PGP SIGNATURE-----/,$d'
+            echo
+            # If a previous tag exists, append a one-line commit log since then.
+            prev="$(git describe --tags --abbrev=0 "$tag^" 2>/dev/null || true)"
+            if [ -n "$prev" ]; then
+              echo "## Commits since $prev"
+              echo
+              git log --pretty='- %s' "$prev..$tag"
+            fi
+          } > release-notes.md
+          echo "--- release-notes.md ---"
+          cat release-notes.md
 
       - name: Build tarball
         run: |
