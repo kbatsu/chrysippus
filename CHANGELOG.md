@@ -9,6 +9,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _(nothing yet)_
 
+## [1.0.0] — 2026-04-17 — first public release
+
+### Added — docs site + polish (Phase 8)
+
+**`docs/` content for mkdocs-material**:
+- `docs/index.md` — landing page with quickstart and table of personas.
+- `docs/install/` — per-agent install pages (claude-code, cursor,
+  agents-md [Codex/Cline], aider, windsurf, gemini) plus overview.
+- `docs/personas/` — per-persona pages with demo, flavor matrix,
+  preservation rules, and guardrails for all four skills.
+- `docs/extending.md` — step-by-step guide for adding a new persona,
+  adding a flavor, or refreshing a lexicon.
+- `docs/security.md` — supply-chain posture, hook model, SHA256
+  verification, prompt-injection considerations.
+
+**Static site**:
+- `mkdocs.yml` — mkdocs-material config with dark/light theme toggle,
+  navigation, search.
+- `.github/workflows/docs.yml` — on push-to-main touching `docs/` or
+  `mkdocs.yml`, builds the site and deploys to GitHub Pages.
+  Site lives at `https://kbatsu.github.io/chrysippus/`.
+
+**README polish**:
+- Badges at top: CI status, latest release, MIT license, docs site link.
+- Quickstart section at top with one-command install for Claude Code and
+  file-copy instructions for each other agent.
+- Project title updated from `shakespeare` to `chrysippus` to match the
+  final repo name.
+
+### Bumped
+
+- `plugin.json` and `marketplace.json` → `1.0.0`.
+- CHANGELOG → `[1.0.0]`.
+
+### Notes
+
+This is the first public release. All 8 planned phases (foundation →
+multi-agent → Claude distribution → quality → polish) have shipped. The
+eval runner remains deferred (rubrics are locked in at
+`evals/rubrics/<persona>.yml`; the runner that calls the Claude API to
+grade outputs will come in a later minor release).
+
 ## [0.7.0] — 2026-04-17
 
 ### Added — quality stack (Phase 7)
@@ -293,7 +335,8 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/kbatsu/chrysippus/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/kbatsu/chrysippus/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/kbatsu/chrysippus/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/kbatsu/chrysippus/compare/v0.4.0...v0.5.0

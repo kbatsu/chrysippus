@@ -1,17 +1,65 @@
-# shakespeare (+ sibling skills)
+# chrysippus
 
-Portable Claude Code skills that change the register of Claude's prose
-while leaving code, file paths, command output, error text, and anything
-inside backticks verbatim.
+[![CI](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml/badge.svg)](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/kbatsu/chrysippus?sort=semver)](https://github.com/kbatsu/chrysippus/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple)](https://kbatsu.github.io/chrysippus/)
 
-Two skills ship from this repo:
+Portable persona skills for AI coding agents that change the register of
+the agent's prose while leaving code, file paths, command output, error
+text, and anything inside backticks verbatim.
+
+Four persona skills ship from this repo:
 
 - **`shakespeare`** — Early Modern English (c. 1600, Bardic register).
 - **`pirate`** — Treasure Island / Pirates-of-the-Caribbean register.
+- **`gen-alpha`** — Internet-native ironic Gen-Alpha slang.
+- **`toronto-mans`** — Toronto / Multicultural-Toronto-English caricature.
+
+Supported agents: **Claude Code** (first-class plugin), **Codex**, **Cline**,
+**Aider**, **Cursor**, **Windsurf**, **Gemini CLI**. Generated from a single
+canonical source at `rules/<persona>/`.
 
 Inspired by [caveman](https://github.com/JuliusBrussee/caveman). Same
 mechanism, different aesthetics: instead of compressing speech, these
 skills retune it.
+
+## Quickstart
+
+**Claude Code** (one command):
+
+```bash
+claude plugin marketplace add kbatsu/chrysippus
+claude plugin install chrysippus@chrysippus
+# then in any session: /chrysippus:shakespeare
+```
+
+**Other agents**: copy the generated file that your agent reads.
+
+```bash
+git clone https://github.com/kbatsu/chrysippus /tmp/chrysippus
+cd your-project
+
+cp /tmp/chrysippus/AGENTS.md .              # Codex, Cline, Aider (AGENTS.md convention)
+cp /tmp/chrysippus/GEMINI.md .              # Gemini CLI
+cp /tmp/chrysippus/CONVENTIONS.md .         # Aider (alternative)
+cp /tmp/chrysippus/.windsurfrules .         # Windsurf
+cp /tmp/chrysippus/.clinerules .            # Cline
+cp -r /tmp/chrysippus/.cursor .             # Cursor IDE
+```
+
+Then trigger any persona with its phrase:
+
+```
+speak like Shakespeare
+talk like a pirate
+talk like gen alpha
+talk like a toronto mans
+```
+
+Deactivate with *"stop &lt;persona&gt;"* or *"speak plainly"*.
+
+Full documentation: **<https://kbatsu.github.io/chrysippus/>**
 
 ## Demo
 

@@ -1,0 +1,62 @@
+site_name: chrysippus
+site_description: Portable persona skills for AI coding agents
+site_url: https://kbatsu.github.io/chrysippus/
+repo_url: https://github.com/kbatsu/chrysippus
+repo_name: kbatsu/chrysippus
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - content.action.edit
+
+nav:
+  - Overview: index.md
+  - Install:
+      - Overview: install/index.md
+      - Claude Code: install/claude-code.md
+      - Cursor: install/cursor.md
+      - Codex / Cline (AGENTS.md): install/agents-md.md
+      - Aider: install/aider.md
+      - Windsurf: install/windsurf.md
+      - Gemini CLI: install/gemini.md
+  - Personas:
+      - Overview: personas/index.md
+      - shakespeare: personas/shakespeare.md
+      - pirate: personas/pirate.md
+      - gen-alpha: personas/gen-alpha.md
+      - toronto-mans: personas/toronto-mans.md
+  - Extending: extending.md
+  - Security: security.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search
