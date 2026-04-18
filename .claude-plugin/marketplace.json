@@ -1,18 +1,23 @@
 {
-  "name": "chrysippus",
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "kbatsu-plugins",
+  "description": "Plugins by kbatsu for Claude Code. Currently ships `chrysippus` — persona skills (shakespeare, pirate, gen-alpha, toronto-mans) that change register without changing behavior.",
   "owner": {
-    "name": "kbatsu",
-    "url": "https://github.com/kbatsu"
+    "name": "Eyram Dornor"
   },
   "plugins": [
     {
       "name": "chrysippus",
-      "source": {
-        "source": "github",
-        "repo": "kbatsu/chrysippus"
-      },
       "description": "Persona skills for Claude Code — shakespeare, pirate, gen-alpha, toronto-mans. Change register without changing behavior.",
-      "version": "1.0.0",
+      "source": "./",
+      "version": "1.0.4",
+      "author": {
+        "name": "Eyram Dornor"
+      },
+      "homepage": "https://github.com/kbatsu/chrysippus",
+      "repository": "https://github.com/kbatsu/chrysippus",
+      "license": "MIT",
+      "category": "productivity",
       "keywords": [
         "persona",
         "skill",

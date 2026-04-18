@@ -1,9 +1,13 @@
 # chrysippus
 
 [![CI](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml/badge.svg)](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/kbatsu/chrysippus?sort=semver)](https://github.com/kbatsu/chrysippus/releases/latest)
+[![Release](https://img.shields.io/github/v/tag/kbatsu/chrysippus?sort=semver&label=release)](https://github.com/kbatsu/chrysippus/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple)](https://kbatsu.github.io/chrysippus/)
+
+> *Named after [Chrysippus of Soli](https://en.wikipedia.org/wiki/Chrysippus)
+> (c. 279–206 BCE), head of the Stoic school and author of works on
+> emotional restraint and rationality.*
 
 Portable persona skills for AI coding agents that change the register of
 the agent's prose while leaving code, file paths, command output, error
@@ -21,8 +25,11 @@ Supported agents: **Claude Code** (first-class plugin), **Codex**, **Cline**,
 canonical source at `rules/<persona>/`.
 
 Inspired by [caveman](https://github.com/JuliusBrussee/caveman). Same
-mechanism, different aesthetics: instead of compressing speech, these
-skills retune it.
+mechanism, different goal: caveman compresses speech to **save tokens**;
+chrysippus retunes register **for fun**. There are no token savings here
+— if anything, register-shifting adds a touch of overhead. Run it
+because you want your agent to sound like the Bard, not because you want
+a smaller bill.
 
 ## Quickstart
 
@@ -30,9 +37,14 @@ skills retune it.
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
-claude plugin install chrysippus@chrysippus
+claude plugin install chrysippus@kbatsu-plugins
 # then in any session: /chrysippus:shakespeare
 ```
+
+If you installed via the marketplace, `/chrysippus:personas` lists every
+persona and its flavors — handy when you forget what's available. Every
+persona activation also announces the active flavor, the other flavors,
+and how to switch/stop.
 
 **Other agents**: copy the generated file that your agent reads.
 
@@ -60,6 +72,9 @@ talk like a toronto mans
 Deactivate with *"stop &lt;persona&gt;"* or *"speak plainly"*.
 
 Full documentation: **<https://kbatsu.github.io/chrysippus/>**
+(rendered with mkdocs-material; source in [`docs/`](docs/), built and
+deployed automatically by `.github/workflows/docs.yml` on every push to
+`main` that touches `docs/` or `mkdocs.yml`).
 
 ## Demo
 
@@ -166,7 +181,7 @@ Available via the Claude Code marketplace:
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
-claude plugin install chrysippus@chrysippus
+claude plugin install chrysippus@kbatsu-plugins
 ```
 
 This installs the plugin — all four personas, the slash commands, the
@@ -394,6 +409,12 @@ in-character git history (your reviewers will have opinions).
 After editing any config mid-session, say *"reload <skill> config"* so
 Claude re-reads it. New sessions read configs automatically.
 
+See [**docs/configuration.md**](docs/configuration.md) for the full
+config model — every toggle explained, hard-locks, reload mechanics,
+and danger combos. See [**docs/recipes.md**](docs/recipes.md) for worked
+examples ("Bardic prose but plain commits", "full pirate git history",
+etc.).
+
 ## Mid-session controls
 
 Shared across all skills:
@@ -449,6 +470,17 @@ Four per-persona code-review subagents, plus a meta "dramaturg":
 
 Each reviewer declares the corresponding skill in its frontmatter, so the
 persona's full rules load automatically when the subagent runs.
+
+Invoke with an `@`-mention:
+
+```
+@chrysippus:shakespeare-reviewer review my latest PR
+```
+
+See [**docs/subagents.md**](docs/subagents.md) for the full invocation
+guide — natural-language, session-default, passing context, when to
+use a subagent vs. your main session, and an example of what each
+reviewer's output looks like.
 
 ## SessionStart hook (opt-in auto-activation)
 
@@ -533,7 +565,6 @@ skill, edit the `rules/` source and re-run `scripts/render.py`. See
 
 ## Credits
 
-Pattern borrowed from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman).
 Voices borrowed from a man who has been dead 410 years and still writes
 better than most of us; from a fictional register that never really existed
 but has outlived most that did; and from internet-meme culture, parodied by

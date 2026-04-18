@@ -17,6 +17,14 @@ class TestPluginJson(unittest.TestCase):
         self.assertIn("name", self.manifest)
         self.assertEqual(self.manifest["name"], "chrysippus")
 
+    def test_plugin_name_matches_plugin_json(self):
+        """plugin.json `name` must match marketplace.json plugin entry name."""
+        marketplace = json.loads(
+            (ROOT / ".claude-plugin" / "marketplace.json").read_text()
+        )
+        plugin_entry = marketplace["plugins"][0]
+        self.assertEqual(self.manifest["name"], plugin_entry["name"])
+
     def test_version_is_semver_shaped(self):
         version = self.manifest.get("version", "")
         parts = version.split(".")
@@ -60,12 +68,51 @@ class TestMarketplaceJson(unittest.TestCase):
         self.assertIsInstance(self.manifest["plugins"], list)
         self.assertGreater(len(self.manifest["plugins"]), 0)
 
-    def test_plugin_source_is_github(self):
+    def test_plugin_source_is_a_valid_form(self):
+        """Source must be one of the Claude Code plugin-marketplace source
+        forms. For our monorepo setup (plugin content lives in the same repo
+        as marketplace.json), './' is correct and avoids a second clone."""
         entry = self.manifest["plugins"][0]
         source = entry.get("source")
-        self.assertIsInstance(source, dict, "source should be an object")
-        self.assertEqual(source.get("source"), "github")
-        self.assertIn("/", source.get("repo", ""), "repo should be 'owner/name'")
+
+        if isinstance(source, str):
+            # Relative-path form — must start with './' per schema.
+            self.assertTrue(
+                source.startswith("./"),
+                f"string source must start with './' (got {source!r})",
+            )
+        elif isinstance(source, dict):
+            kind = source.get("source")
+            self.assertIn(
+                kind, ("github", "url", "git-subdir", "npm"),
+                f"unexpected source type: {kind!r}",
+            )
+            if kind == "github":
+                self.assertIn("/", source.get("repo", ""), "repo should be 'owner/name'")
+            elif kind == "url":
+                url = source.get("url", "")
+                self.assertTrue(
+                    url.startswith(("https://", "git@")),
+                    f"url source must start with https:// or git@ (got {url!r})",
+                )
+        else:
+            self.fail(f"source must be a string or object; got {type(source).__name__}")
+
+    def test_marketplace_has_top_level_description(self):
+        """A top-level description helps discoverability in marketplace listings."""
+        self.assertIn("description", self.manifest)
+        self.assertTrue(
+            len(self.manifest["description"]) > 20,
+            "top-level description looks suspiciously short",
+        )
+
+    def test_marketplace_schema_reference(self):
+        """$schema reference gives editor/tool validation; nice-to-have."""
+        # Not strictly required, but if present it should point at the
+        # Anthropic-hosted schema.
+        schema = self.manifest.get("$schema")
+        if schema is not None:
+            self.assertIn("anthropic.com", schema)
 
 
 if __name__ == "__main__":

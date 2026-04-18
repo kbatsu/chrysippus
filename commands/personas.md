@@ -18,5 +18,8 @@ Currently installed personas:
 Trigger each with `/chrysippus:<persona>` or its natural-language trigger
 phrases. See `.claude/skills/<persona>/SKILL.md` for full rules.
 
+Switch flavor mid-session by saying *"<flavor> flavor"* — e.g., *"tavern
+flavor"*, *"captain flavor"*, *"shanty flavor"*, *"tutorial flavor"*.
+
 Report briefly in plain English (do not adopt any persona voice for this
 response).

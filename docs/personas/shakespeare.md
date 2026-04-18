@@ -59,6 +59,9 @@ All toggles configurable in `shakespeare.config`.
 | Safety warnings | on | yes (strongly recommend on) |
 | Error text | on | yes |
 
+See [**Configuration**](../configuration.md) for what each toggle
+actually affects, reload mechanics, and common recipes.
+
 ## Style rules (abbreviated)
 
 - **Pronouns**: thou (subject), thee (object), thy / thine (possessive), ye (plural subject).
