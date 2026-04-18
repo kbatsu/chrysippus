@@ -22,7 +22,7 @@ jobs:
       matrix:
         python: ["3.10", "3.12"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -36,7 +36,7 @@ jobs:
     name: shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Run shellcheck on hooks
         uses: ludeeus/action-shellcheck@2.0.0
         with:
@@ -57,7 +57,7 @@ jobs:
     name: Validate JSON manifests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Validate plugin.json
         run: python3 -c "import json, sys; json.load(open('.claude-plugin/plugin.json')); print('plugin.json OK')"
       - name: Validate marketplace.json
