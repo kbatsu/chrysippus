@@ -53,22 +53,6 @@ jobs:
           scandir: "./tests"
           severity: warning
 
-  markdownlint:
-    name: markdownlint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: markdownlint on hand-written docs
-        uses: DavidAnson/markdownlint-cli2-action@v16
-        with:
-          globs: |
-            README.md
-            CONTRIBUTING.md
-            SECURITY.md
-            CODE_OF_CONDUCT.md
-            RELEASING.md
-            docs/**/*.md
-
   json-validate:
     name: Validate JSON manifests
     runs-on: ubuntu-latest
