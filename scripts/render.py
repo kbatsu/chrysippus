@@ -231,10 +231,13 @@ def render_config(meta):
     # Aligned preserve toggle lines with inline comments
     keys = list(meta["preserve_defaults"].keys())
     key_width = max(len(k) for k in keys)
+    locked = set(meta.get("preserve_locked") or [])
     preserve_lines = []
     for key in keys:
         val = str(meta["preserve_defaults"][key]).lower()
         comment = PRESERVE_COMMENTS.get(key, "")
+        if key in locked:
+            comment = (comment + " — HARD-LOCKED, cannot be changed").lstrip(" —")
         line = f"  {key}:{' ' * (key_width - len(key))} {val}"
         if comment:
             line = f"{line:<32}  # {comment}"

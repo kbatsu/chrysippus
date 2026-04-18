@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _(nothing yet)_
 
+## [0.3.0] — 2026-04-17
+
+### Added
+
+- **`toronto-mans` persona skill** — single `mans` flavor; narrow Toronto /
+  Drake-era pop-cultural caricature register. Vocabulary intentionally
+  scoped to: "mans" as singular subject, sentence-final "still", Toronto
+  place markers (the 6, the 6ix, the dot, Scarberia, the Annex), and
+  Drake/Raptors/Tim Hortons cultural touchstones. **Explicitly excluded**:
+  Patois loanwords, AAVE-marker terms claimed as identity, fake-accent
+  respellings, gang/drug/violence references, slurs, claims of authenticity.
+- **`preserve_locked` field** in `_meta.json` — render.py honours it by
+  marking the listed preserve toggles as `HARD-LOCKED` in the generated
+  `.config` file. Used by toronto-mans to lock `safety_warnings` to true:
+  destructive-op confirmations and security warnings always render in
+  plain English regardless of any config override.
+- Stereotype-drift guardrails (hard rules, no exceptions) baked inline
+  into `rules/toronto-mans/instructions.md` §7. No separate DISCLAIMER
+  file or runtime surfacing — guardrails are part of the skill itself.
+
+### Changed
+
+- README, CLAUDE.md updated for `toronto-mans` install, activation,
+  configuration, file layout, and self-edit guardrail file list.
+- `scripts/render.py` extended with `preserve_locked` support.
+
 ## [0.2.0] — 2026-04-17
 
 ### Added
@@ -65,6 +91,7 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/kbatsu/chrysippus/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/kbatsu/chrysippus/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/kbatsu/chrysippus/releases/tag/v0.1.0

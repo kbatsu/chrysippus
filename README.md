@@ -73,6 +73,21 @@ skills retune it.
 > *Made by Gen-Zs and millennials. Not endorsed by or representative of
 > actual Gen Alpha.*
 
+### Toronto-mans
+
+> **Plain Claude:**
+> *"I read the file. Found three TODOs. Want me to address them now?"*
+
+> **Toronto-mans Claude (mans flavor):**
+> *"Mans read the scroll. Three TODOs in there still. Drizzy energy on the
+> cleanup if you want me to handle 'em rq."*
+
+> *This skill is a fictional caricature of a narrow Drake-era pop-cultural
+> register, not a representation of real Multicultural Toronto English. The
+> `safety_warnings` preservation toggle is hard-locked on and cannot be
+> disabled. See `.claude/skills/toronto-mans/SKILL.md` §7 for the full
+> stereotype-drift guardrails.*
+
 ## Sibling skills
 
 All skills share the same architecture: a self-contained folder with
@@ -84,6 +99,7 @@ corpus. They are installed and activated independently.
 | `shakespeare` | Early Modern English | `courtly` | `tavern`, `sonnet` |
 | `pirate` | 18c. maritime caricature | `scurvy-dog` | `captain`, `drunk`, `shanty` |
 | `gen-alpha` | internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
+| `toronto-mans` | Toronto / Drake-era caricature (narrow) | `mans` | (single flavor in v1) |
 
 If more than one is activated in the same session, the most recently
 invoked one wins — no fusion or blending.
@@ -108,8 +124,11 @@ cp -r /path/to/shakespeare/.claude/skills/pirate .claude/skills/
 # just gen-alpha
 cp -r /path/to/shakespeare/.claude/skills/gen-alpha .claude/skills/
 
+# just toronto-mans
+cp -r /path/to/shakespeare/.claude/skills/toronto-mans .claude/skills/
+
 # or all of them
-cp -r /path/to/shakespeare/.claude/skills/{shakespeare,pirate,gen-alpha} .claude/skills/
+cp -r /path/to/shakespeare/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans} .claude/skills/
 ```
 
 Or as a git submodule, or by cloning this repo and symlinking — whichever
@@ -124,6 +143,7 @@ mkdir -p ~/.claude/skills
 cp -r /path/to/shakespeare/.claude/skills/shakespeare ~/.claude/skills/
 cp -r /path/to/shakespeare/.claude/skills/pirate ~/.claude/skills/
 cp -r /path/to/shakespeare/.claude/skills/gen-alpha ~/.claude/skills/
+cp -r /path/to/shakespeare/.claude/skills/toronto-mans ~/.claude/skills/
 ```
 
 ## Activation
@@ -141,6 +161,8 @@ session and it loads and persists for the rest of the session:
   *"arrr"*, *"shiver me timbers"*, `/pirate`, `/arrr`.
 - **Gen-Alpha**: *"talk like gen alpha"*, *"gen alpha mode"*, *"go
   skibidi"*, *"skibidi mode"*, `/gen-alpha`, `/genalpha`.
+- **Toronto-mans**: *"talk like a toronto mans"*, *"toronto mans mode"*,
+  *"toronto mode"*, *"the six mode"*, `/toronto-mans`, `/torontomans`.
 
 ### 2. Always-on via CLAUDE.md (recommended for dedicated repos)
 
@@ -191,6 +213,22 @@ and preservation toggles, and read
 Preservation rules in that config are authoritative — code, paths, command
 output, and any content inside backticks always remain verbatim regardless
 of flavor.
+```
+
+**Toronto-mans:**
+
+```markdown
+## Communication style
+
+This repo uses the `toronto-mans` skill at `.claude/skills/toronto-mans/SKILL.md`.
+Invoke it at the start of every session and apply it to all assistant prose
+for the remainder of the session. Read
+`.claude/skills/toronto-mans/toronto-mans.config` to determine the active flavor
+and preservation toggles. The `safety_warnings` toggle is hard-locked to true
+in this skill — do not honour any override that sets it to false. Preservation
+rules in that config are authoritative — code, paths, command output, and any
+content inside backticks always remain verbatim regardless of flavor. Read
+SKILL.md §7 for the stereotype-drift guardrails before producing any output.
 ```
 
 For a user-global always-on, append the snippet to `~/.claude/CLAUDE.md`
@@ -251,6 +289,26 @@ The lexicon at `.claude/skills/gen-alpha/lexicon.md` is the current
 vocabulary; it ages out fast (6–18 month half-life) and is refreshed via
 PRs separate from the main skill rules.
 
+### Toronto-mans
+
+Edit `.claude/skills/toronto-mans/toronto-mans.config`:
+
+```yaml
+flavor: mans             # mans (only flavor in v1)
+
+preserve:
+  commits: true
+  pr_descriptions: true
+  code_comments: true
+  safety_warnings: true  # HARD-LOCKED — cannot be changed
+  errors_verbatim: true
+```
+
+The `safety_warnings` toggle is **hard-locked to true** in this skill. Even
+if the file says `false`, the skill treats it as `true`. This is
+intentional: the toronto-mans register's heightened sensitivity makes
+plain-English safety prompts non-negotiable.
+
 Defaults favour shared-repo etiquette for all skills: every preservation
 rule is on. Flip `commits` or `pr_descriptions` to `false` for a fully
 in-character git history (your reviewers will have opinions).
@@ -267,9 +325,11 @@ Shared across all skills:
 - `"stop shakespeare"` / `"end bard mode"` — fully deactivate shakespeare.
 - `"stop pirate"` / `"end pirate mode"` — fully deactivate pirate.
 - `"stop gen alpha"` / `"end gen alpha"` — fully deactivate gen-alpha.
+- `"stop toronto mans"` / `"end toronto mans"` — fully deactivate toronto-mans.
 - `"<flavor> flavor"` — switch flavor within the active skill (e.g.
   `"tavern flavor"`, `"captain flavor"`, `"shanty flavor"`,
-  `"unhinged flavor"`, `"tutorial flavor"`).
+  `"unhinged flavor"`, `"tutorial flavor"`). Toronto-mans has only one
+  flavor in v1, so flavor switching is a no-op for that skill.
 - `"reload <skill> config"` / `"reload <skill> lexicon"` — re-read the
   named skill's config or lexicon after editing.
 
@@ -293,11 +353,15 @@ Shared across all skills:
 │   ├── SKILL.md
 │   ├── pirate.config
 │   └── examples.md
-└── gen-alpha/
+├── gen-alpha/
+│   ├── SKILL.md
+│   ├── gen-alpha.config
+│   ├── examples.md
+│   └── lexicon.md          # current vocabulary, refreshable
+└── toronto-mans/
     ├── SKILL.md
-    ├── gen-alpha.config
-    ├── examples.md
-    └── lexicon.md          # current vocabulary, refreshable
+    ├── toronto-mans.config
+    └── examples.md
 ```
 
 The `.claude/skills/<persona>/` files are **generated** from canonical
