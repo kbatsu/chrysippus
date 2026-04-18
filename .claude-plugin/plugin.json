@@ -1,7 +1,7 @@
 {
   "name": "chrysippus",
   "version": "1.0.1",
-  "description": "Persona skills that change Claude Code's register without changing what code it writes. Ships shakespeare (Early Modern English), pirate (Treasure Island), gen-alpha (internet-native slang), and toronto-mans (Toronto/MTE caricature). Code, paths, commits, safety warnings, and errors stay in plain English by default \u2014 configurable per skill.",
+  "description": "Persona skills that change Claude Code's register without changing what code it writes. Ships shakespeare (Early Modern English), pirate (Treasure Island), gen-alpha (internet-native slang), and toronto-mans (Toronto/MTE caricature). Code, paths, commits, safety warnings, and errors stay in plain English by default — configurable per skill.",
   "author": {
     "name": "kbatsu"
   },
@@ -20,8 +20,5 @@
     "prose",
     "caricature"
   ],
-  "skills": ".claude/skills/",
-  "commands": "commands/",
-  "agents": "agents/",
-  "hooks": "hooks/hooks.json"
+  "skills": "./.claude/skills/"
 }

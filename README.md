@@ -25,8 +25,11 @@ Supported agents: **Claude Code** (first-class plugin), **Codex**, **Cline**,
 canonical source at `rules/<persona>/`.
 
 Inspired by [caveman](https://github.com/JuliusBrussee/caveman). Same
-mechanism, different aesthetics: instead of compressing speech, these
-skills retune it.
+mechanism, different goal: caveman compresses speech to **save tokens**;
+chrysippus retunes register **for fun**. There are no token savings here
+— if anything, register-shifting adds a touch of overhead. Run it
+because you want your agent to sound like the Bard, not because you want
+a smaller bill.
 
 ## Quickstart
 
@@ -540,7 +543,8 @@ skill, edit the `rules/` source and re-run `scripts/render.py`. See
 
 ## Credits
 
-Pattern borrowed from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman).
+Hat tip to [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
+for the initial idea.
 Voices borrowed from a man who has been dead 410 years and still writes
 better than most of us; from a fictional register that never really existed
 but has outlived most that did; and from internet-meme culture, parodied by

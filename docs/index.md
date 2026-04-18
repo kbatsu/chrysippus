@@ -10,6 +10,11 @@ Codex, Cursor, Windsurf, Aider, Cline, and Gemini CLI. Each persona changes
 how the agent *talks* (vocabulary, tone, register) while leaving what it
 *does* (code, commands, tool output) untouched.
 
+Inspired by [caveman](https://github.com/JuliusBrussee/caveman) — same
+mechanism, different goal. caveman compresses speech to **save tokens**;
+chrysippus retunes register **for fun**. There are no token savings here;
+if anything, register-shifting adds a touch of overhead.
+
 | Persona | Register | Flavors |
 |---|---|---|
 | [`shakespeare`](personas/shakespeare.md) | Early Modern English (c. 1600, Bardic) | `courtly`, `tavern`, `sonnet` |
@@ -59,7 +64,7 @@ has its own one-line setup.
 
 ## Credits
 
-Pattern borrowed from [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman).
+Hat tip to [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
+for the initial idea.
 Repo named after [Chrysippus of Soli](https://en.wikipedia.org/wiki/Chrysippus),
-the Stoic philosopher who championed emotional restraint and rationality —
-a deliberately ironic choice for a repo of theatrical persona voices.
+the Stoic philosopher who championed emotional restraint and rationality.
