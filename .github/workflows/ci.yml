@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Run unit tests
-        run: tests/run.sh -v
+        run: bash tests/run.sh -v
       - name: Check render drift
         run: python3 scripts/render.py --check
 
