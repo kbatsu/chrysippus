@@ -34,11 +34,11 @@ jobs:
           fi
 
       - name: Extract CHANGELOG section for this release
-        id: changelog
         run: |
-          python3 <<'PY' > release-notes.md
+          python3 <<'PY'
           from pathlib import Path
           import re
+          import sys
           import os
           version = os.environ["VERSION"]
           text = Path("CHANGELOG.md").read_text()
@@ -46,9 +46,9 @@ jobs:
           pattern = re.compile(rf"## \[{re.escape(version)}\][^\n]*\n(.*?)(?=\n## \[|\Z)", re.DOTALL)
           m = pattern.search(text)
           if not m:
-              print(f"ERROR: no CHANGELOG entry found for {version}", flush=True)
+              print(f"ERROR: no CHANGELOG entry found for {version}", file=sys.stderr)
               raise SystemExit(2)
-          print(m.group(1).strip())
+          Path("release-notes.md").write_text(m.group(1).strip() + "\n")
           PY
         env:
           VERSION: ${{ steps.version.outputs.version }}
@@ -62,7 +62,6 @@ jobs:
           ls -la dist/
 
       - name: Compute SHA256
-        id: sha
         run: |
           cd dist
           sha256sum "chrysippus-${{ steps.version.outputs.version }}.tar.gz" > "chrysippus-${{ steps.version.outputs.version }}.tar.gz.sha256"

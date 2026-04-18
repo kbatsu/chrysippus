@@ -171,6 +171,109 @@ class TestRenderFunctions(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             render.load_meta("no-such-persona")
 
+    def test_render_config_locked_keys_show_no_double_dash_when_no_comment(self):
+        """Regression: HARD-LOCKED suffix used to leak a leading ' — ' when
+        the underlying preserve_comments lookup returned an empty string."""
+        meta = {
+            "name": "synthetic",
+            "flavors": [{"name": "x", "description": "x", "default": True}],
+            "preserve_defaults": {"unknown_key_with_no_comment": True},
+            "preserve_locked": ["unknown_key_with_no_comment"],
+        }
+        out = render.render_config(meta)
+        # Should contain the lock note without leading " — "
+        self.assertIn("HARD-LOCKED, cannot be changed", out)
+        self.assertNotIn("#  — HARD-LOCKED", out)
+        self.assertNotIn("# — HARD-LOCKED", out)
+
+
+class TestActivationLineQuoting(unittest.TestCase):
+    """Regression tests for the trigger-quoting bug in _activation_line.
+
+    The previous implementation used `f"*{t!r}*".replace("'", '"')` which
+    silently corrupted triggers containing single quotes (because repr would
+    switch to double-quoted form, defeating the replace).
+    """
+
+    def test_quote_trigger_handles_plain_text(self):
+        self.assertEqual(
+            render._quote_trigger_for_markdown("speak like Shakespeare"),
+            '*"speak like Shakespeare"*',
+        )
+
+    def test_quote_trigger_handles_single_quote(self):
+        # Was previously broken: repr would emit `"thee 'n' thou"` (double-
+        # quoted) and the .replace would corrupt the inner single quotes.
+        out = render._quote_trigger_for_markdown("thee 'n' thou")
+        self.assertEqual(out, '*"thee \'n\' thou"*')
+
+    def test_quote_trigger_escapes_double_quote(self):
+        out = render._quote_trigger_for_markdown('say "hello"')
+        self.assertEqual(out, '*"say \\"hello\\""*')
+
+    def test_activation_line_uses_safe_quoting(self):
+        meta = {"triggers": ["foo", "bar's baz"]}
+        line = render._activation_line("synthetic", meta)
+        self.assertIn('*"foo"*', line)
+        self.assertIn('*"bar\'s baz"*', line)
+
+
+class TestFindOrphans(unittest.TestCase):
+    """Regression tests for orphan-file detection in run_check.
+
+    The previous run_check only iterated over rendered outputs; if a persona
+    was removed from rules/, the stale .claude/skills/<persona>/ files would
+    pass the drift check unnoticed.
+    """
+
+    def test_no_orphans_in_clean_repo(self):
+        # All files under MANAGED_OUTPUT_DIRS in the live repo should be
+        # accounted for by a fresh render. (This is what `--check` itself
+        # asserts in CI; here we exercise find_orphans directly.)
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            personas = sorted(p.name for p in render.RULES_DIR.iterdir() if p.is_dir())
+            render.do_render(personas, tmp_root)
+            personas_meta = {p: render.load_meta(p) for p in personas}
+            text_outputs = render.build_text_outputs(personas_meta, tmp_root)
+            copy_outputs = render.build_copy_outputs(personas, tmp_root)
+            rendered = {t.relative_to(tmp_root) for t, _ in text_outputs + copy_outputs}
+            orphans = render.find_orphans(rendered)
+        self.assertEqual(orphans, [], f"unexpected orphans in clean repo: {orphans}")
+
+    def test_orphan_detected_in_managed_dir(self):
+        """Synthesise a stale committed file in a temp 'committed' tree and
+        verify find_orphans flags it."""
+        with tempfile.TemporaryDirectory() as tmp:
+            committed = Path(tmp)
+            stale_skill = committed / ".claude" / "skills" / "ghost-persona" / "SKILL.md"
+            stale_skill.parent.mkdir(parents=True)
+            stale_skill.write_text("# stale\n")
+            stale_mdc = committed / ".cursor" / "rules" / "ghost-persona.mdc"
+            stale_mdc.parent.mkdir(parents=True)
+            stale_mdc.write_text("---\n")
+
+            rendered = set()  # nothing rendered → both files are orphans
+            orphans = render.find_orphans(rendered, committed_root=committed)
+
+        self.assertEqual(
+            sorted(str(p) for p in orphans),
+            sorted([
+                str(Path(".claude/skills/ghost-persona/SKILL.md")),
+                str(Path(".cursor/rules/ghost-persona.mdc")),
+            ]),
+        )
+
+    def test_orphan_detection_ignores_unmanaged_dirs(self):
+        """Files outside MANAGED_OUTPUT_DIRS must never be flagged as orphans."""
+        with tempfile.TemporaryDirectory() as tmp:
+            committed = Path(tmp)
+            unmanaged = committed / "src" / "user_code.py"
+            unmanaged.parent.mkdir(parents=True)
+            unmanaged.write_text("# user file, not chrysippus's business\n")
+            orphans = render.find_orphans(set(), committed_root=committed)
+        self.assertEqual(orphans, [])
+
 
 if __name__ == "__main__":
     unittest.main()

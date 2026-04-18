@@ -153,7 +153,7 @@ corpus. They are installed and activated independently.
 | `shakespeare` | Early Modern English | `courtly` | `tavern`, `sonnet` |
 | `pirate` | 18c. maritime caricature | `scurvy-dog` | `captain`, `drunk`, `shanty` |
 | `gen-alpha` | internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
-| `toronto-mans` | Toronto / Drake-era caricature (narrow) | `mans` | (single flavor in v1) |
+| `toronto-mans` | Toronto / MTE caricature (Patois + AAVE borrows) | `mans` | (single flavor in v1) |
 
 If more than one is activated in the same session, the most recently
 invoked one wins — no fusion or blending.
@@ -162,7 +162,7 @@ invoked one wins — no fusion or blending.
 
 ### Claude Code marketplace install (recommended for Claude Code users)
 
-Once `v0.6.0+` is published:
+Available via the Claude Code marketplace:
 
 ```bash
 claude plugin marketplace add kbatsu/chrysippus
@@ -190,19 +190,19 @@ Copy the skill folder(s) you want into the target repo's
 mkdir -p .claude/skills
 
 # just shakespeare
-cp -r /path/to/shakespeare/.claude/skills/shakespeare .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/shakespeare .claude/skills/
 
 # just pirate
-cp -r /path/to/shakespeare/.claude/skills/pirate .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/pirate .claude/skills/
 
 # just gen-alpha
-cp -r /path/to/shakespeare/.claude/skills/gen-alpha .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/gen-alpha .claude/skills/
 
 # just toronto-mans
-cp -r /path/to/shakespeare/.claude/skills/toronto-mans .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/toronto-mans .claude/skills/
 
 # or all of them
-cp -r /path/to/shakespeare/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans} .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans} .claude/skills/
 ```
 
 Or as a git submodule, or by cloning this repo and symlinking — whichever
@@ -214,10 +214,10 @@ Copy the folder(s) into your personal Claude Code skills directory:
 
 ```bash
 mkdir -p ~/.claude/skills
-cp -r /path/to/shakespeare/.claude/skills/shakespeare ~/.claude/skills/
-cp -r /path/to/shakespeare/.claude/skills/pirate ~/.claude/skills/
-cp -r /path/to/shakespeare/.claude/skills/gen-alpha ~/.claude/skills/
-cp -r /path/to/shakespeare/.claude/skills/toronto-mans ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/shakespeare ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/pirate ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/gen-alpha ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/toronto-mans ~/.claude/skills/
 ```
 
 ## Activation
@@ -308,9 +308,9 @@ SKILL.md §7 for the stereotype-drift guardrails before producing any output.
 For a user-global always-on, append the snippet to `~/.claude/CLAUDE.md`
 and change the path to `~/.claude/skills/<skill>/`.
 
-To override the configured flavor without editing the config (e.g. you want
-sonnet but the team voted courtly), append `Default flavor: sonnet` to the
-snippet above.
+To switch flavor for a session, edit the relevant `<skill>.config` file (and
+say `"reload <skill> config"` mid-session) or use the trigger-phrase form
+*"<flavor> flavor"* (e.g. `"sonnet flavor"`).
 
 ## Configuration
 

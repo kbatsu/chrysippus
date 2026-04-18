@@ -37,10 +37,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run shellcheck on all shipped shell scripts
+      - name: Run shellcheck on hooks
         uses: ludeeus/action-shellcheck@2.0.0
         with:
           scandir: "./hooks"
+          severity: warning
+      - name: Run shellcheck on scripts
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: "./scripts"
+          severity: warning
+      - name: Run shellcheck on tests
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: "./tests"
           severity: warning
 
   markdownlint:
@@ -59,7 +69,6 @@ jobs:
             CHANGELOG.md
             RELEASING.md
             docs/**/*.md
-        continue-on-error: true
 
   json-validate:
     name: Validate JSON manifests

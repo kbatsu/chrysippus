@@ -25,7 +25,9 @@ if [[ ! -f "${state_file}" ]]; then
   exit 0
 fi
 
-# Trim whitespace; take first non-empty line.
+# Strip all whitespace and cap at 64 bytes. Result must match the persona
+# allow-list below; anything else is rejected. State file is plugin-managed
+# (written by activate.sh), so this is paranoid input-handling, not parsing.
 active="$(tr -d '[:space:]' < "${state_file}" | head -c 64)"
 
 if [[ -z "${active}" ]]; then

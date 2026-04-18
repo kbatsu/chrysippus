@@ -28,7 +28,7 @@ AI coding agents:
     .windsurfrules    (Windsurf / Codeium)
     .clinerules       (Cline)
 
-Zero runtime dependencies — Python 3.8+ stdlib only.
+Zero runtime dependencies — Python 3.10+ stdlib only.
 """
 
 import argparse
@@ -45,6 +45,15 @@ RULES_DIR = ROOT / "rules"
 SKILLS_DIR = ROOT / ".claude" / "skills"
 
 DESC_WRAP_WIDTH = 70
+
+# Directories that render.py fully owns — every file under these is expected
+# to be produced by a render run. Anything committed under one of these
+# directories that doesn't match a rendered output is an orphan (stale;
+# typically left behind when a persona is removed from rules/).
+MANAGED_OUTPUT_DIRS = (
+    Path(".claude") / "skills",
+    Path(".cursor") / "rules",
+)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -126,8 +135,10 @@ def run_check(personas):
         text_outputs = build_text_outputs(personas_meta, tmp_root)
         copy_outputs = build_copy_outputs(personas, tmp_root)
 
+        rendered_rel_paths = set()
         for target, _ in text_outputs + copy_outputs:
             rel = target.relative_to(tmp_root)
+            rendered_rel_paths.add(rel)
             committed = ROOT / rel
             if not committed.exists():
                 drifts.append(f"  {rel}: rendered but not committed")
@@ -143,17 +154,51 @@ def run_check(personas):
                 ))
                 drifts.append(diff)
 
+        # Detect orphans — committed files in managed dirs that weren't rendered
+        # this run (typically stale files left behind when a persona was removed
+        # from rules/).
+        for orphan in find_orphans(rendered_rel_paths):
+            drifts.append(
+                f"  {orphan}: committed but not rendered (stale — "
+                "persona removed from rules/?)"
+            )
+
     if drifts:
         print("DRIFT — generated output does not match committed files:", file=sys.stderr)
         print("", file=sys.stderr)
         for d in drifts:
             print(d, file=sys.stderr)
         print("", file=sys.stderr)
-        print("To fix: run scripts/render.py and commit the result.", file=sys.stderr)
+        print(
+            "To fix: run scripts/render.py and commit the result. If stale "
+            "files are reported, `git rm` them.",
+            file=sys.stderr,
+        )
         return 1
 
     print(f"clean — {len(personas)} persona(s) match committed output")
     return 0
+
+
+def find_orphans(rendered_rel_paths, committed_root=None):
+    """Return sorted list of relative Paths committed under MANAGED_OUTPUT_DIRS
+    that are NOT in `rendered_rel_paths`.
+
+    `rendered_rel_paths` must be a set of Paths relative to the output root.
+    """
+    committed_root = Path(committed_root) if committed_root else ROOT
+    orphans = []
+    for sub in MANAGED_OUTPUT_DIRS:
+        full = committed_root / sub
+        if not full.exists():
+            continue
+        for f in full.rglob("*"):
+            if not f.is_file():
+                continue
+            rel = f.relative_to(committed_root)
+            if rel not in rendered_rel_paths:
+                orphans.append(rel)
+    return sorted(orphans)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -167,7 +212,6 @@ def load_meta(persona):
         raise FileNotFoundError(f"missing {meta_path}")
     meta = json.loads(meta_path.read_text())
     meta["_instructions"] = (src / "instructions.md").read_text()
-    meta["_src_dir"] = src
     return meta
 
 
@@ -285,7 +329,8 @@ def render_config(meta):
         val = str(meta["preserve_defaults"][key]).lower()
         comment = PRESERVE_COMMENTS.get(key, "")
         if key in locked:
-            comment = (comment + " — HARD-LOCKED, cannot be changed").lstrip(" —")
+            lock_note = "HARD-LOCKED, cannot be changed"
+            comment = f"{comment} — {lock_note}" if comment else lock_note
         line = f"  {key}:{' ' * (key_width - len(key))} {val}"
         if comment:
             line = f"{line:<32}  # {comment}"
@@ -357,13 +402,19 @@ def _persona_table_row(persona, meta):
     default_flavor = next(f["name"] for f in meta["flavors"] if f.get("default"))
     others = [f["name"] for f in meta["flavors"] if not f.get("default")]
     others_str = ", ".join(f"`{f}`" for f in others) if others else "(none)"
-    return (
-        f"| `{persona}` | `{default_flavor}` | {others_str} |"
-    )
+    return f"| `{persona}` | `{default_flavor}` | {others_str} |"
+
+
+def _quote_trigger_for_markdown(trigger):
+    """Render a trigger phrase as a double-quoted italic token, escaping any
+    embedded double quotes. Replaces a previous repr-based implementation that
+    corrupted triggers containing single quotes."""
+    escaped = trigger.replace('"', '\\"')
+    return f'*"{escaped}"*'
 
 
 def _activation_line(persona, meta):
-    triggers = ", ".join(f"*{t!r}*".replace("'", '"') for t in meta["triggers"])
+    triggers = ", ".join(_quote_trigger_for_markdown(t) for t in meta["triggers"])
     return f"- **`{persona}`** — triggers: {triggers}"
 
 

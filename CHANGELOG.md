@@ -7,6 +7,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed — production review pass
+
+A deep code review surfaced two real bugs and a clutch of doc/robustness
+issues. All fixed; 8 new regression tests added (49 tests total, up from 41).
+
+**Bugs**:
+
+- `scripts/render.py` `--check` could not detect orphaned committed files.
+  If a persona was removed from `rules/`, the stale `.claude/skills/<persona>/`
+  and `.cursor/rules/<persona>.mdc` files would pass the drift check
+  unnoticed. Added `find_orphans()` plus an enumeration of
+  `MANAGED_OUTPUT_DIRS` (`.claude/skills/`, `.cursor/rules/`); `run_check`
+  now flags any committed file in those dirs that wasn't produced by the
+  current render. Three new tests cover clean-repo, synthetic-orphan, and
+  unmanaged-dir cases.
+- `scripts/render.py` `_activation_line` used `f"*{t!r}*".replace("'", '"')`
+  to format trigger phrases in `AGENTS.md` / `GEMINI.md` / etc. This relied
+  on `repr()` always emitting single quotes; `repr()` switches to double
+  quotes when the string contains a single quote, defeating the replace and
+  silently corrupting the output. Replaced with an explicit
+  `_quote_trigger_for_markdown()` helper that escapes embedded double
+  quotes. Four new tests cover the previously-broken paths.
+
+**Documentation**:
+
+- `README.md` install snippets used `/path/to/shakespeare/` as the source
+  directory placeholder; corrected to `/path/to/chrysippus/` to match the
+  actual repo name.
+- `README.md` "Once `v0.6.0+` is published" qualifier was stale (v1.0.0 is
+  current); reworded to "Available via the Claude Code marketplace:".
+- `README.md` sibling-skills table description for `toronto-mans` still
+  read "Toronto / Drake-era caricature (narrow)" — the v0.4.0 lexicon
+  expansion explicitly removed all Drake/Raptors/Tim Hortons references.
+  Updated to "Toronto / MTE caricature (Patois + AAVE borrows)".
+- `README.md` documented a `Default flavor: sonnet` override mechanism
+  appended to the CLAUDE.md snippet, but no skill actually parses such a
+  directive. Replaced with an accurate description of the trigger-phrase
+  flavor switch (`"sonnet flavor"`) and config-file edits.
+- `CLAUDE.md` heading included "(skills repo, currently dir-named
+  `shakespeare`)" — internal scaffolding from the in-progress directory
+  rename. Removed; ships clean to downstream Claude Code installs.
+
+**Robustness**:
+
+- `scripts/render.py` `render_config`: simplified the `HARD-LOCKED`
+  comment-suffix logic from a brittle `lstrip(" —")` pattern to an
+  explicit conditional. New regression test covers the
+  empty-base-comment path.
+- `scripts/render.py` `_persona_table_row`: removed redundant outer
+  parentheses.
+- `scripts/render.py` `load_meta`: dropped unused `_src_dir` field on
+  the meta dict.
+- `scripts/render.py` docstring: updated "Python 3.8+" claim to
+  "Python 3.10+" — matches what CI actually exercises.
+- `hooks/session-start.sh`: corrected misleading "trim whitespace; take
+  first non-empty line" comment to accurately describe the
+  strip-all-whitespace + cap-at-64-bytes + allow-list-validate behavior.
+- `.github/workflows/ci.yml`: shellcheck job now also scans `scripts/`
+  and `tests/`, not only `hooks/`. (Closes the gap where the local
+  `scripts/ci.sh` was stricter than CI.)
+- `.github/workflows/ci.yml`: removed `continue-on-error: true` from the
+  markdownlint job — the linter is now load-bearing on PRs.
+- `.github/workflows/release.yml`: error message in CHANGELOG-extraction
+  step now goes to stderr (was stdout, getting mixed into the would-be
+  `release-notes.md`). The script also writes its output via `pathlib`
+  instead of via shell-redirect, so a partial / failed run no longer
+  leaves a corrupt `release-notes.md` lingering.
+- `.github/workflows/release.yml`: removed unused `id: changelog` and
+  `id: sha` step ids.
+- New `.markdownlint.json` config disables a small set of well-known
+  noisy rules (line length, inline HTML, autolink-bare-URLs, etc.) so
+  the now-blocking markdownlint step passes on the existing prose
+  without false positives.
+
 ### Removed
 
 - `PLAN.md` — the durable execution roadmap added in `v0.1.0` and kept in
