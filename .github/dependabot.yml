@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Keep GitHub Actions up to date. We pin actions by tag in workflow files; this
+  # picks up new versions and opens PRs against main.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"

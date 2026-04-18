@@ -69,13 +69,26 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `ci:`, `lexicon:`.
 Scope to a persona where applicable: `feat(pirate): add captain flavor`.
 
+## Running tests locally
+
+```bash
+scripts/ci.sh          # full CI — render check, tests, JSON validation, shell syntax
+tests/run.sh           # just the unit tests
+tests/run.sh -v        # verbose unit tests
+python3 -m unittest tests.test_render          # one module
+```
+
+Tests are Python 3 stdlib only — no PyPI deps needed.
+
 ## Pull request checklist
 
-- [ ] `scripts/render.py` run; generated files match source.
+- [ ] `scripts/render.py` run; generated files match source (CI gate: `scripts/render.py --check`).
 - [ ] CHANGELOG updated under `## [Unreleased]`.
-- [ ] Tests added for new generator logic; existing tests still pass.
-- [ ] If adding a persona or flavor: README updated, demo added.
-- [ ] If touching guardrails: rationale documented in PR description.
+- [ ] Tests added for new generator logic; existing tests still pass (`scripts/ci.sh`).
+- [ ] If adding a persona or flavor: README updated, demo added, rubric
+      stub added at `evals/rubrics/<persona>.yml`.
+- [ ] If touching guardrails: rationale documented in PR description, and
+      corresponding `evals/rubrics/<persona>.yml` `forbidden_tokens` updated.
 
 ## Releases
 

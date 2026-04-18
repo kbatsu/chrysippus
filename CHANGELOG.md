@@ -9,6 +9,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _(nothing yet)_
 
+## [0.7.0] — 2026-04-17
+
+### Added — quality stack (Phase 7)
+
+**Tests** (`tests/`) — 41 unit tests across four modules. Python 3 stdlib
+only (`unittest`). Runs via `tests/run.sh`.
+
+- `tests/test_render.py` — render round-trip, check-drift gate,
+  per-persona SKILL.md/config presence, preserve_locked marker, cursor
+  MDC structure, multi-agent file presence, render module unit tests.
+- `tests/test_manifest.py` — plugin.json + marketplace.json schema
+  validation, version ↔ CHANGELOG sync check, component-path existence.
+- `tests/test_lexicon.py` — lexicon presence, toronto-mans guardrail
+  integrity (Patois expletives stay in Excluded section, attribution
+  paragraph present, safety_warnings hard-locked), gen-alpha disclaimer
+  presence, pirate stereotype-drift keywords, `_meta.json` schema.
+- `tests/test_hooks.py` — shell script syntax, executable bit,
+  `hooks/activate.sh` behavior against a tmpdir-mocked project,
+  `hooks/session-start.sh` output when state set / missing / invalid.
+
+**CI** (`.github/workflows/`):
+
+- `ci.yml` — on PR + push-to-main: runs unit tests on Python 3.10 + 3.12,
+  `render.py --check` drift gate, shellcheck on hooks, markdownlint on
+  hand-written docs, JSON manifest validation. Fails PRs on any
+  regression.
+- `release.yml` — on `v*` tag push: verifies `plugin.json` version
+  matches the tag, extracts the CHANGELOG section for the release,
+  builds a git-archive tarball, computes SHA256, creates a GitHub Release
+  with the tarball + checksum attached. Release notes sourced from the
+  CHANGELOG entry.
+- `dependabot.yml` — weekly GitHub Actions update sweeps.
+
+**Local CI** — `scripts/ci.sh` runs the same checks locally (render drift,
+unit tests, JSON validation, shell syntax, optional shellcheck). Useful
+before opening a PR.
+
+**Evals scaffold** (`evals/`):
+
+- `evals/README.md` — framing, layout, contribution guidance.
+- `evals/rubrics/<persona>.yml` — per-persona grading rubrics with
+  required_tokens, forbidden_tokens, preservation_checks, and
+  flavor_specific requirements. Toronto-mans rubric includes the full
+  guardrail forbidden list (Patois expletives, fake-accent respellings,
+  real-person refs, brand refs, gang-coded neighborhoods).
+
+**Eval runner is deferred** — the Python script that actually calls the
+Claude API to generate and grade outputs is tracked in `PLAN.md`'s
+open-follow-ups. Rubric format is locked in so the runner can be added
+without rubric churn.
+
+### Changed
+
+- `plugin.json` and `marketplace.json` bumped to `0.7.0`.
+- CHANGELOG bumped to `[0.7.0]`.
+
 ## [0.6.0] — 2026-04-17
 
 ### Added — Claude Code distribution (Phase 6)
@@ -237,7 +293,8 @@ full Tier-1 production foundation.
   multiple persona skills. The Stoic philosopher's name is a deliberately
   ironic choice for a repo of theatrical voices.
 
-[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/kbatsu/chrysippus/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/kbatsu/chrysippus/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/kbatsu/chrysippus/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/kbatsu/chrysippus/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/kbatsu/chrysippus/compare/v0.3.0...v0.4.0
