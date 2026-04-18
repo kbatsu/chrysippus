@@ -8,8 +8,8 @@
     {
       "name": "chrysippus",
       "source": {
-        "source": "github",
-        "repo": "kbatsu/chrysippus"
+        "source": "url",
+        "url": "https://github.com/kbatsu/chrysippus.git"
       },
       "description": "Persona skills for Claude Code \u2014 shakespeare, pirate, gen-alpha, toronto-mans. Change register without changing behavior.",
       "version": "1.0.2",

@@ -60,12 +60,30 @@ class TestMarketplaceJson(unittest.TestCase):
         self.assertIsInstance(self.manifest["plugins"], list)
         self.assertGreater(len(self.manifest["plugins"]), 0)
 
-    def test_plugin_source_is_github(self):
+    def test_plugin_source_points_at_github_repo(self):
+        """Source must be either a github shorthand or an explicit GitHub
+        HTTPS clone URL. We use the url form to force anonymous HTTPS and
+        bypass Claude Code's SSH-preferring default for `github` sources."""
         entry = self.manifest["plugins"][0]
         source = entry.get("source")
         self.assertIsInstance(source, dict, "source should be an object")
-        self.assertEqual(source.get("source"), "github")
-        self.assertIn("/", source.get("repo", ""), "repo should be 'owner/name'")
+
+        kind = source.get("source")
+        self.assertIn(kind, ("github", "url"), f"unexpected source type: {kind}")
+
+        if kind == "github":
+            self.assertIn("/", source.get("repo", ""), "repo should be 'owner/name'")
+        else:
+            url = source.get("url", "")
+            self.assertTrue(
+                url.startswith("https://github.com/"),
+                f"url source must be an https GitHub URL (got {url!r}); SSH "
+                f"URLs break anonymous install for users without SSH keys",
+            )
+            self.assertTrue(
+                url.endswith(".git"),
+                f"url source should end with .git (got {url!r})",
+            )
 
 
 if __name__ == "__main__":
