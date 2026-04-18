@@ -12,9 +12,9 @@ claude plugin install chrysippus@kbatsu-plugins
 
 Two commands. You now have:
 
-- Four persona skills (auto-discovered under `.claude/skills/`)
-- Five slash commands (`/chrysippus:<persona>` + `/chrysippus:personas`)
-- Five subagents (four `<persona>-reviewer` + `dramaturg`)
+- Five persona skills (auto-discovered under `.claude/skills/`)
+- Six slash commands (`/chrysippus:<persona>` + `/chrysippus:personas`)
+- Six subagents (five `<persona>-reviewer` + `dramaturg`)
 - One `SessionStart` hook (opt-in per project)
 
 ## Per-repo manual install
@@ -25,7 +25,7 @@ If you'd rather copy the skills in by hand:
 cd your-project
 mkdir -p .claude/skills
 git clone https://github.com/kbatsu/chrysippus /tmp/chrysippus
-cp -r /tmp/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans} .claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans,ontario-bud} .claude/skills/
 ```
 
 For always-on activation in this repo, append to `CLAUDE.md`:
@@ -47,7 +47,7 @@ preservation toggles.
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/kbatsu/chrysippus /tmp/chrysippus
-cp -r /tmp/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans} ~/.claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans,ontario-bud} ~/.claude/skills/
 ```
 
 ## Enabling the auto-activation hook
@@ -82,6 +82,7 @@ SessionStart hook reads it and injects activation instructions.
 | `/chrysippus:pirate` | Activate pirate |
 | `/chrysippus:gen-alpha` | Activate gen-alpha |
 | `/chrysippus:toronto-mans` | Activate toronto-mans |
+| `/chrysippus:ontario-bud` | Activate ontario-bud |
 | `/chrysippus:personas` | List installed personas; show which is active |
 
 Every persona activation also announces the active flavor, the other
@@ -94,11 +95,11 @@ flavor switch) are natural-language triggers in the skill itself.
 
 ## Subagents
 
-Five subagents are installed:
+Six subagents are installed:
 
 - `shakespeare-reviewer`, `pirate-reviewer`, `gen-alpha-reviewer`,
-  `toronto-mans-reviewer` — code review in the persona's voice, with
-  substantive technical feedback.
+  `toronto-mans-reviewer`, `ontario-bud-reviewer` — code review in the
+  persona's voice, with substantive technical feedback.
 - `dramaturg` — meta-agent that audits persona rule-adherence. Speaks
   plainly itself.
 

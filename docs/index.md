@@ -4,7 +4,7 @@
 > (c. 279–206 BCE), head of the Stoic school and author of works on
 > emotional restraint and rationality.*
 
-Four persona skills for AI coding agents. Same prompt, four voices,
+Five persona skills for AI coding agents. Same prompt, five voices,
 identical code output.
 
 Works with: **Claude Code** (first-class plugin) · **Codex** · **Cursor** ·
@@ -15,24 +15,29 @@ Works with: **Claude Code** (first-class plugin) · **Codex** · **Cursor** ·
 ## Demo 1 — "What does this repo do?"
 
 > 🎭 **[shakespeare](personas/shakespeare.md) — courtly**
-> *"A trove of personas, good sir — four registers for thy AI agent to don.
-> Bardic, piratey, youthful, or Toronto-coded. The code remaineth verbatim;
-> only the voice doth shift."*
+> *"A trove of personas, good sir — five registers for thy AI agent to
+> don. Bardic, piratey, youthful, Toronto-coded, or rural-Ontarian. The
+> code remaineth verbatim; only the voice doth shift."*
 
 > 🏴‍☠️ **[pirate](personas/pirate.md) — scurvy-dog**
-> *"Aye matey — four voices for Claude Code and its kin. Ye can speak like
-> the Bard, a buccaneer, a gen-alpha, or a Toronto mans. Code stays as
-> writ; only the words change."*
+> *"Aye matey — five voices for Claude Code and its kin. Ye can speak like
+> the Bard, a buccaneer, a gen-alpha, a Toronto mans, or an Ontario bud.
+> Code stays as writ; only the words change."*
 
 > 🫠 **[gen-alpha](personas/gen-alpha.md) — unhinged**
-> *"ok so 4 voices for claude code. shakespeare pirate gen-alpha
-> toronto-mans. code untouched fr. purely for vibes no cap. also made by
-> millennials bc of course."*
+> *"ok so 5 voices for claude code. shakespeare pirate gen-alpha
+> toronto-mans ontario-bud. code untouched fr. purely for vibes no cap.
+> also made by millennials bc of course."*
 
 > 6️⃣ **[toronto-mans](personas/toronto-mans.md) — mans**
-> *"Mans ship four persona skills for AI coding agents fam. Bard, pirate,
-> gen-alpha, and toronto-mans — you're reading it. Code stays plain no
-> cap, only the voice shifts still."*
+> *"Mans ship five persona skills for AI coding agents fam. Bard, pirate,
+> gen-alpha, toronto-mans, and ontario-bud — you're reading it. Code stays
+> plain no cap, only the voice shifts still."*
+
+> 🇨🇦 **[ontario-bud](personas/ontario-bud.md) — bud**
+> *"Five voices in here, bud. Bardic, piratey, gen-alpha, toronto-mans,
+> and ontario-bud — that's me. Code stays plain English, just the voice
+> changes. Pitter patter."*
 
 ## Demo 2 — "Bug on line 42 of `parse.ts` — `null` isn't handled. Advice?"
 
@@ -52,6 +57,10 @@ Works with: **Claude Code** (first-class plugin) · **Codex** · **Cursor** ·
 > 6️⃣ **toronto-mans**
 > *"Bug on line 42 of `parse.ts` still fam — `null` ain't being handled.
 > Easy ting to fix: null-guard before the call. Bare simple no cap."*
+
+> 🇨🇦 **ontario-bud**
+> *"Bug on line 42 of `parse.ts` there, bud — `null` ain't being
+> handled. Easy fix: drop a null-guard in afore the call. Sorted."*
 
 > Notice `parse.ts` and `null` in every response — backtick contents stay
 > verbatim regardless of register. That's the preservation rule, one of
@@ -85,7 +94,7 @@ Done. The Bard greets you.
 For other agents, see the [install guide](install/index.md) — each agent
 has its own one-line setup.
 
-## The four personas
+## The five personas
 
 | Persona | Register | Flavors |
 |---|---|---|
@@ -93,6 +102,7 @@ has its own one-line setup.
 | [`pirate`](personas/pirate.md) | Treasure Island / Pirates-of-the-Caribbean | `scurvy-dog`, `captain`, `drunk`, `shanty` |
 | [`gen-alpha`](personas/gen-alpha.md) | Internet-native ironic Gen-Alpha slang | `unhinged`, `corporate`, `tutorial` |
 | [`toronto-mans`](personas/toronto-mans.md) | Toronto / MTE caricature (with attribution) | `mans` |
+| [`ontario-bud`](personas/ontario-bud.md) | Rural-Ontario / Letterkenny-inspired caricature | `bud` |
 
 ## What's preserved regardless of active persona
 
@@ -110,7 +120,7 @@ has its own one-line setup.
   flavor matrix, and register-specific guardrails.
 - **[Configuration](configuration.md)** — the config-file model,
   preservation toggles, hard-locks, reload mechanics.
-- **[Subagents](subagents.md)** — the 4 per-persona reviewers + the
+- **[Subagents](subagents.md)** — the 5 per-persona reviewers + the
   dramaturg meta-agent: what they do and how to invoke them.
 - **[Recipes](recipes.md)** — worked examples for common tasks
   ("Bardic prose but plain commits", "full pirate git history", etc.).

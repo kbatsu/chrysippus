@@ -68,6 +68,7 @@ speak like Shakespeare
 talk like a pirate
 talk like gen alpha
 talk like a toronto mans
+ontario bud
 ```
 
 Deactivate with *"stop &lt;persona&gt;"* or *"speak plainly"*.
@@ -170,6 +171,7 @@ corpus. They are installed and activated independently.
 | `pirate` | 18c. maritime caricature | `scurvy-dog` | `captain`, `drunk`, `shanty` |
 | `gen-alpha` | internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
 | `toronto-mans` | Toronto / MTE caricature (Patois + AAVE borrows) | `mans` | (single flavor in v1) |
+| `ontario-bud` | rural-Ontario / Letterkenny-inspired caricature | `bud` | (single flavor in v1) |
 
 If more than one is activated in the same session, the most recently
 invoked one wins — no fusion or blending.
@@ -185,7 +187,7 @@ claude plugin marketplace add kbatsu/chrysippus
 claude plugin install chrysippus@kbatsu-plugins
 ```
 
-This installs the plugin — all four personas, the slash commands, the
+This installs the plugin — all five personas, the slash commands, the
 reviewer subagents, and the SessionStart hook — into your user-global
 Claude Code settings. To enable auto-activation of a persona for a
 specific project:
@@ -193,7 +195,7 @@ specific project:
 ```bash
 cd your-project
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/activate.sh" shakespeare
-# (or: pirate / gen-alpha / toronto-mans / off / status)
+# (or: pirate / gen-alpha / toronto-mans / ontario-bud / off / status)
 ```
 
 ### Per-repo install (copy the skill folders by hand)
@@ -217,8 +219,11 @@ cp -r /path/to/chrysippus/.claude/skills/gen-alpha .claude/skills/
 # just toronto-mans
 cp -r /path/to/chrysippus/.claude/skills/toronto-mans .claude/skills/
 
+# just ontario-bud
+cp -r /path/to/chrysippus/.claude/skills/ontario-bud .claude/skills/
+
 # or all of them
-cp -r /path/to/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans} .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans,ontario-bud} .claude/skills/
 ```
 
 Or as a git submodule, or by cloning this repo and symlinking — whichever
@@ -234,6 +239,7 @@ cp -r /path/to/chrysippus/.claude/skills/shakespeare ~/.claude/skills/
 cp -r /path/to/chrysippus/.claude/skills/pirate ~/.claude/skills/
 cp -r /path/to/chrysippus/.claude/skills/gen-alpha ~/.claude/skills/
 cp -r /path/to/chrysippus/.claude/skills/toronto-mans ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/ontario-bud ~/.claude/skills/
 ```
 
 ## Activation
@@ -253,6 +259,8 @@ session and it loads and persists for the rest of the session:
   skibidi"*, *"skibidi mode"*, `/gen-alpha`, `/genalpha`.
 - **Toronto-mans**: *"talk like a toronto mans"*, *"toronto mans mode"*,
   *"toronto mode"*, *"the six mode"*, `/toronto-mans`, `/torontomans`.
+- **Ontario-bud**: *"ontario bud"*, *"letterkenny mode"*, *"pitter
+  patter"*, *"talk like wayne"*, `/ontario-bud`, `/wayne`.
 
 ### 2. Always-on via CLAUDE.md (recommended for dedicated repos)
 

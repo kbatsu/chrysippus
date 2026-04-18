@@ -35,9 +35,10 @@ Practical differences from the main conversation:
 | `pirate-reviewer` | PR / branch review in pirate voice |
 | `gen-alpha-reviewer` | PR / branch review in gen-alpha voice |
 | `toronto-mans-reviewer` | PR / branch review in toronto-mans voice |
+| `ontario-bud-reviewer` | PR / branch review in ontario-bud voice |
 | `dramaturg` | Meta-agent — audits persona rule-adherence |
 
-The four reviewers all do the same substantive work (code-review against
+The five reviewers all do the same substantive work (code-review against
 a diff or branch); only the voice differs. The dramaturg is different in
 kind — it audits OTHER responses for drift and is intentionally plain-
 spoken itself.

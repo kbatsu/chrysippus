@@ -31,7 +31,7 @@ Same as other agents:
 
 ## Note on size
 
-`GEMINI.md` is ~45KB (all four personas concatenated). That's within
+`GEMINI.md` is ~60KB (all five personas concatenated). That's within
 Gemini's context budget. If you only want one persona, you can trim the
 file to just that persona's section; the activation triggers and
 preservation rules still need to be present.
