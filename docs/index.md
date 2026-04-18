@@ -118,8 +118,3 @@ has its own one-line setup.
   a lexicon.
 - **[Security](security.md)** — supply-chain posture, hook model,
   SHA256 verification.
-
-## Credits
-
-Hat tip to [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
-for the initial idea.

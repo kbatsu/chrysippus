@@ -565,8 +565,6 @@ skill, edit the `rules/` source and re-run `scripts/render.py`. See
 
 ## Credits
 
-Hat tip to [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman)
-for the initial idea.
 Voices borrowed from a man who has been dead 410 years and still writes
 better than most of us; from a fictional register that never really existed
 but has outlived most that did; and from internet-meme culture, parodied by
