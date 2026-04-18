@@ -3,7 +3,7 @@
 [![CI](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml/badge.svg)](https://github.com/kbatsu/chrysippus/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/kbatsu/chrysippus?sort=semver)](https://github.com/kbatsu/chrysippus/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple)](https://kbatsu.github.io/chrysippus/)
+[![Docs](https://img.shields.io/badge/docs-mkdocs--material-purple)](https://github.com/kbatsu/chrysippus/tree/main/docs)
 
 Portable persona skills for AI coding agents that change the register of
 the agent's prose while leaving code, file paths, command output, error
@@ -59,7 +59,10 @@ talk like a toronto mans
 
 Deactivate with *"stop &lt;persona&gt;"* or *"speak plainly"*.
 
-Full documentation: **<https://kbatsu.github.io/chrysippus/>**
+Full documentation: see [`docs/`](docs/) in this repo. A rendered
+mkdocs-material site is published to GitHub Pages automatically on push
+to `main` (see `.github/workflows/docs.yml`); once it's live, the URL
+will be linked from the badge above.
 
 ## Demo
 
