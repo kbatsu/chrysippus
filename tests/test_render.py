@@ -121,15 +121,16 @@ class TestRenderedMultiAgent(unittest.TestCase):
     ]
 
     def test_root_multi_agent_files_present(self):
+        all_personas = sorted(p.name for p in RULES_DIR.iterdir() if p.is_dir())
         for name in self.EXPECTED_ROOT_FILES:
             with self.subTest(file=name):
                 path = ROOT / name
                 self.assertTrue(path.exists(), f"missing {path}")
                 content = path.read_text()
                 # Each multi-agent file should document "persona" concept
-                # and list all 4 persona names in its body.
+                # and list every persona name in its body.
                 self.assertIn("persona", content.lower()[:2000])
-                for persona in ("shakespeare", "pirate", "gen-alpha", "toronto-mans"):
+                for persona in all_personas:
                     self.assertIn(
                         persona, content,
                         f"{name}: missing persona name '{persona}'",
@@ -147,6 +148,48 @@ class TestRenderedMultiAgent(unittest.TestCase):
                 self.assertTrue(content.startswith("---\n"))
                 self.assertIn("description: ", content[:1000])
                 self.assertIn("alwaysApply:", content[:1000])
+
+
+class TestHandWrittenPerPersonaFiles(unittest.TestCase):
+    """Per-persona slash command and reviewer subagent files are
+    intentionally hand-written (not auto-generated). These tests enforce
+    that every persona has them, so a new persona PR can't merge with
+    them missing."""
+
+    def test_every_persona_has_command_md(self):
+        for persona_dir in RULES_DIR.iterdir():
+            if not persona_dir.is_dir():
+                continue
+            cmd = ROOT / "commands" / f"{persona_dir.name}.md"
+            with self.subTest(persona=persona_dir.name):
+                self.assertTrue(
+                    cmd.exists(),
+                    f"missing hand-written {cmd} — every persona needs a "
+                    f"slash-command file under commands/",
+                )
+                # Sanity: must declare itself as a slash command (has
+                # YAML frontmatter with a description).
+                content = cmd.read_text(encoding="utf-8")
+                self.assertTrue(content.startswith("---\n"),
+                                f"{cmd} missing YAML frontmatter")
+                self.assertIn("description:", content[:300])
+
+    def test_every_persona_has_reviewer_md(self):
+        for persona_dir in RULES_DIR.iterdir():
+            if not persona_dir.is_dir():
+                continue
+            rev = ROOT / "agents" / f"{persona_dir.name}-reviewer.md"
+            with self.subTest(persona=persona_dir.name):
+                self.assertTrue(
+                    rev.exists(),
+                    f"missing hand-written {rev} — every persona needs a "
+                    f"reviewer subagent under agents/",
+                )
+                content = rev.read_text(encoding="utf-8")
+                self.assertTrue(content.startswith("---\n"))
+                # Must declare the corresponding skill in frontmatter so
+                # the reviewer loads the right register.
+                self.assertIn(f"skills: [{persona_dir.name}]", content[:500])
 
 
 class TestRenderFunctions(unittest.TestCase):

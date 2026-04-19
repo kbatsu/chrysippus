@@ -34,6 +34,7 @@ Zero runtime dependencies — Python 3.10+ stdlib only.
 import argparse
 import difflib
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -43,6 +44,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RULES_DIR = ROOT / "rules"
 SKILLS_DIR = ROOT / ".claude" / "skills"
+TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 
 DESC_WRAP_WIDTH = 70
 
@@ -54,6 +56,255 @@ MANAGED_OUTPUT_DIRS = (
     Path(".claude") / "skills",
     Path(".cursor") / "rules",
 )
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Marker-based partial injection (machinery — Phase 1)
+# ────────────────────────────────────────────────────────────────────────────
+#
+# Some files outside MANAGED_OUTPUT_DIRS contain persona-driven content that
+# would otherwise need hand-updating per persona (counts, tables, lists).
+# These files are mostly hand-written, but specific zones inside them are
+# bracketed by marker comments and rendered from _meta.json:
+#
+#   <!-- chrysippus:persona-table BEGIN -->
+#   ...auto-generated content...
+#   <!-- chrysippus:persona-table END -->
+#
+# Marker syntax depends on the host file's comment style — markdown uses
+# HTML comments, bash/yaml use #-style. JSON has no comment syntax, so
+# JSON files use field-replace mode (parse-mutate-serialize) instead of
+# marker injection — see update_json_field() below.
+
+MARKER_FORMATS = {
+    ".md":   ("<!-- chrysippus:{id} BEGIN -->", "<!-- chrysippus:{id} END -->"),
+    ".mdc":  ("<!-- chrysippus:{id} BEGIN -->", "<!-- chrysippus:{id} END -->"),
+    ".sh":   ("# chrysippus:{id} BEGIN",        "# chrysippus:{id} END"),
+    ".yml":  ("# chrysippus:{id} BEGIN",        "# chrysippus:{id} END"),
+    ".yaml": ("# chrysippus:{id} BEGIN",        "# chrysippus:{id} END"),
+}
+
+# Marker ids must be lowercase alphanumeric + hyphens. This is the same
+# charset find_markers() searches for, so they stay in sync.
+MARKER_ID_RE = re.compile(r"^[a-z0-9\-]+$")
+
+
+def _validate_marker_id(marker_id):
+    if not MARKER_ID_RE.match(marker_id):
+        raise ValueError(
+            f"invalid marker id {marker_id!r} — must match [a-z0-9-]+"
+        )
+
+
+def _markers_for(path):
+    """Return (begin_line, end_line) marker strings for a file's suffix."""
+    suffix = Path(path).suffix
+    if suffix not in MARKER_FORMATS:
+        raise ValueError(
+            f"no marker format registered for suffix {suffix!r} "
+            f"({path}); register one in MARKER_FORMATS"
+        )
+    return MARKER_FORMATS[suffix]
+
+
+def _zone_pattern(begin, end):
+    """Build a regex matching one BEGIN/.../END zone, capturing inner content."""
+    return re.compile(
+        r"(?P<begin>" + re.escape(begin) + r")"
+        r"(?P<inner>.*?)"
+        r"(?P<end>" + re.escape(end) + r")",
+        re.DOTALL,
+    )
+
+
+def render_zone(text, suffix, marker_id, content):
+    """Return `text` with the named zone's inner content replaced by `content`.
+
+    The marker lines themselves are preserved. `content` is sandwiched between
+    newlines so the markers stay on their own lines and the zone is readable
+    when viewed raw.
+
+    Raises ValueError if:
+    - `marker_id` is not [a-z0-9-]+
+    - the marker pair is missing or appears more than once
+    - `content` itself contains the begin or end marker for this id
+      (would create nested zones that confuse later renders)
+    """
+    _validate_marker_id(marker_id)
+
+    if suffix not in MARKER_FORMATS:
+        raise ValueError(
+            f"no marker format registered for suffix {suffix!r}"
+        )
+
+    begin_tmpl, end_tmpl = MARKER_FORMATS[suffix]
+    begin = begin_tmpl.format(id=marker_id)
+    end = end_tmpl.format(id=marker_id)
+
+    if begin in content or end in content:
+        raise ValueError(
+            f"render_zone refusing to inject content containing the "
+            f"{marker_id!r} marker — would create nested zones"
+        )
+
+    pattern = _zone_pattern(begin, end)
+    matches = list(pattern.finditer(text))
+    if not matches:
+        raise ValueError(
+            f"marker zone {marker_id!r} not found "
+            f"(expected {begin!r} ... {end!r})"
+        )
+    if len(matches) > 1:
+        raise ValueError(
+            f"marker zone {marker_id!r} appears {len(matches)} times "
+            f"(expected exactly 1)"
+        )
+
+    replacement = f"{begin}\n{content.rstrip()}\n{end}"
+    return pattern.sub(lambda _: replacement, text, count=1)
+
+
+def inject_marker(file_path, marker_id, content):
+    """Read `file_path`, replace the named zone, write back.
+
+    Returns True if the file changed, False if already correct.
+    """
+    suffix = Path(file_path).suffix
+    if suffix not in MARKER_FORMATS:
+        raise ValueError(
+            f"no marker format for suffix {suffix!r}; "
+            f"use update_json_field() for JSON files"
+        )
+    text = Path(file_path).read_text(encoding="utf-8")
+    new_text = render_zone(text, suffix, marker_id, content)
+    if new_text == text:
+        return False
+    Path(file_path).write_text(new_text, encoding="utf-8")
+    return True
+
+
+def check_marker(file_path, marker_id, expected_content):
+    """Return True if `file_path`'s marker zone matches `expected_content`.
+
+    Comparison strips trailing whitespace only (matches what `inject_marker`
+    actually writes, which is `\\n{content.rstrip()}\\n`). Leading whitespace
+    in `content` is preserved by both inject and check, so an indented zone
+    and a flush-left zone are NOT considered equal.
+    """
+    _validate_marker_id(marker_id)
+    suffix = Path(file_path).suffix
+    if suffix not in MARKER_FORMATS:
+        return False
+    text = Path(file_path).read_text(encoding="utf-8")
+    begin_tmpl, end_tmpl = MARKER_FORMATS[suffix]
+    begin = begin_tmpl.format(id=marker_id)
+    end = end_tmpl.format(id=marker_id)
+    pattern = _zone_pattern(begin, end)
+    m = pattern.search(text)
+    if not m:
+        return False
+    # Strip a single trailing newline from each side (boundary tolerance);
+    # do NOT strip leading whitespace (an indented zone is meaningfully
+    # different from a flush-left one).
+    actual = m.group("inner").lstrip("\n").rstrip()
+    expected = expected_content.lstrip("\n").rstrip()
+    return actual == expected
+
+
+def find_markers(file_path):
+    """Return [(marker_id, suffix), ...] for every marker pair in the file.
+
+    Used by tests to assert no orphan markers (markers in source files that
+    aren't fed by any generator). The id charset matches MARKER_ID_RE.
+    """
+    suffix = Path(file_path).suffix
+    if suffix not in MARKER_FORMATS:
+        return []
+    text = Path(file_path).read_text(encoding="utf-8")
+    begin_tmpl, _ = MARKER_FORMATS[suffix]
+    # Match a literal "chrysippus:<id> BEGIN" inside whatever comment style
+    # this file uses, by templating with the same wildcard charset that
+    # _validate_marker_id enforces.
+    begin_re = re.escape(begin_tmpl).replace(r"\{id\}", r"(?P<id>[a-z0-9\-]+)")
+    return [(m.group("id"), suffix) for m in re.finditer(begin_re, text)]
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# JSON field-replace (for files that have no comment syntax)
+# ────────────────────────────────────────────────────────────────────────────
+
+def update_json_field(file_path, mutator):
+    """Read JSON, apply `mutator`, write back if and only if the parsed data
+    actually changed.
+
+    `mutator` may either:
+      - mutate the dict in place (idiomatic), OR
+      - return a new dict (the return value, if not None, replaces the data).
+
+    The semantic-equality check (vs string-equality) means a hand-edited
+    file with non-canonical formatting (e.g. 4-space indent, reordered
+    keys) is NOT rewritten when the mutator is a no-op. Only meaningful
+    changes trigger a rewrite, and the rewrite is canonicalised to
+    2-space indent.
+
+    Returns True if the file was rewritten.
+    """
+    import copy
+
+    path = Path(file_path)
+    original_text = path.read_text(encoding="utf-8")
+    original_data = json.loads(original_text)
+    data = copy.deepcopy(original_data)
+
+    result = mutator(data)
+    if result is not None:
+        data = result
+
+    if data == original_data:
+        return False
+
+    new_text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+    path.write_text(new_text, encoding="utf-8")
+    return True
+
+
+def check_json_field(file_path, expected_mutator):
+    """Return True if applying `expected_mutator` to the file's JSON would
+    produce no semantic change (i.e., the file already matches expected).
+
+    Like `update_json_field`, supports both mutate-in-place and
+    return-new-dict mutator styles."""
+    import copy
+
+    path = Path(file_path)
+    original_data = json.loads(path.read_text(encoding="utf-8"))
+    data = copy.deepcopy(original_data)
+
+    result = expected_mutator(data)
+    if result is not None:
+        data = result
+
+    return data == original_data
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Featured-tier filter
+# ────────────────────────────────────────────────────────────────────────────
+
+def featured_personas(personas_meta):
+    """Return only personas with featured === true, preserving insertion order.
+
+    Strict identity check (`is True`) so truthy non-bool values like
+    `"false"` or `1` from a malformed _meta.json don't sneak through.
+    `load_meta` already validates the field type at load, but this is
+    defense-in-depth for callers using synthetic dicts.
+    """
+    return {p: m for p, m in personas_meta.items() if m.get("featured") is True}
+
+
+def catalog_personas(personas_meta):
+    """Return personas with featured !== true (false, missing, or wrong type)."""
+    return {p: m for p, m in personas_meta.items() if m.get("featured") is not True}
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -112,7 +363,7 @@ def do_render(personas, out_root):
 
     for target, content in text_outputs:
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content)
+        target.write_text(content, encoding="utf-8")
 
     for target, src in copy_outputs:
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -143,8 +394,8 @@ def run_check(personas):
             if not committed.exists():
                 drifts.append(f"  {rel}: rendered but not committed")
                 continue
-            a = committed.read_text().splitlines()
-            b = target.read_text().splitlines()
+            a = committed.read_text(encoding="utf-8").splitlines()
+            b = target.read_text(encoding="utf-8").splitlines()
             if a != b:
                 diff = "\n".join(difflib.unified_diff(
                     a, b,
@@ -205,13 +456,64 @@ def find_orphans(rendered_rel_paths, committed_root=None):
 # Source loading
 # ────────────────────────────────────────────────────────────────────────────
 
+REQUIRED_META_FIELDS = (
+    "name", "version", "description", "triggers", "flavors",
+    "preserve_defaults", "register_short",
+)
+
+
+def _validate_meta(meta, persona):
+    """Raise ValueError on a malformed _meta.json. Catches contributor typos
+    early instead of letting them silently produce broken output."""
+
+    missing = [f for f in REQUIRED_META_FIELDS if f not in meta]
+    if missing:
+        raise ValueError(
+            f"rules/{persona}/_meta.json missing required field(s): "
+            f"{', '.join(missing)}"
+        )
+
+    # Strict bool — accept True/False only. JSON allows strings, so
+    # `"featured": "false"` is truthy in Python and would silently promote.
+    if "featured" in meta and not isinstance(meta["featured"], bool):
+        raise ValueError(
+            f"rules/{persona}/_meta.json: 'featured' must be true or false "
+            f"(got {meta['featured']!r}, type {type(meta['featured']).__name__})"
+        )
+
+    if not isinstance(meta["register_short"], str) or not meta["register_short"].strip():
+        raise ValueError(
+            f"rules/{persona}/_meta.json: 'register_short' must be a "
+            f"non-empty string (got {meta['register_short']!r})"
+        )
+
+    flavors = meta["flavors"]
+    if not isinstance(flavors, list) or not flavors:
+        raise ValueError(
+            f"rules/{persona}/_meta.json: 'flavors' must be a non-empty list"
+        )
+    defaults = [f for f in flavors if f.get("default")]
+    if len(defaults) != 1:
+        raise ValueError(
+            f"rules/{persona}/_meta.json: exactly one flavor must have "
+            f"\"default\": true (found {len(defaults)})"
+        )
+
+    triggers = meta["triggers"]
+    if not isinstance(triggers, list) or not triggers:
+        raise ValueError(
+            f"rules/{persona}/_meta.json: 'triggers' must be a non-empty list"
+        )
+
+
 def load_meta(persona):
     src = RULES_DIR / persona
     meta_path = src / "_meta.json"
     if not meta_path.exists():
         raise FileNotFoundError(f"missing {meta_path}")
-    meta = json.loads(meta_path.read_text())
-    meta["_instructions"] = (src / "instructions.md").read_text()
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    _validate_meta(meta, persona)
+    meta["_instructions"] = (src / "instructions.md").read_text(encoding="utf-8")
     return meta
 
 
@@ -240,6 +542,14 @@ def build_text_outputs(personas_meta, out_root):
     outputs.append((out_root / "CONVENTIONS.md",  render_conventions_md(personas_meta)))
     outputs.append((out_root / ".windsurfrules",  render_windsurfrules(personas_meta)))
     outputs.append((out_root / ".clinerules",     render_clinerules(personas_meta)))
+
+    # Persona-driven single files in shared dirs (commands/, agents/).
+    # NOT in MANAGED_OUTPUT_DIRS because these dirs also contain
+    # hand-written per-persona files that must not be flagged as orphans.
+    outputs.append((out_root / "commands" / "personas.md",
+                    render_personas_command_md(personas_meta)))
+    outputs.append((out_root / "agents" / "dramaturg.md",
+                    render_dramaturg_md(personas_meta)))
 
     return outputs
 
@@ -391,6 +701,252 @@ def render_cursor_mdc(meta):
         "---\n"
         "\n"
         f"{body}"
+    )
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Partial generators — pure functions returning markdown / shell strings
+# ────────────────────────────────────────────────────────────────────────────
+#
+# Each `gen_*` returns a string ready to drop into a marker zone in a
+# consumer file. Generators are pure: given the same personas_meta, the
+# same string. Phase 2 will wire these into render runs that inject into
+# README, docs/, install/, hooks/.
+
+def _persona_default_flavor(meta):
+    """Return the name of the default flavor, or raise ValueError with a
+    clear message naming the offending persona (NOT a cryptic
+    StopIteration)."""
+    for f in meta["flavors"]:
+        if f.get("default"):
+            return f["name"]
+    raise ValueError(
+        f"persona {meta.get('name', '?')!r} has no flavor with "
+        f"\"default\": true (load_meta should have caught this; "
+        f"the input dict was constructed manually)"
+    )
+
+
+def _persona_other_flavors(meta, *, empty_label, fmt="`{}`", joiner=", "):
+    others = [f["name"] for f in meta["flavors"] if not f.get("default")]
+    if not others:
+        return empty_label
+    return joiner.join(fmt.format(f) for f in others)
+
+
+def _persona_title(persona):
+    """'gen-alpha' → 'Gen-Alpha', 'toronto-mans' → 'Toronto-Mans'."""
+    return "-".join(part.capitalize() for part in persona.split("-"))
+
+
+# Markdown special characters that need escaping inside trigger phrases
+# rendered as italic-quoted prose. Keep this list narrow — we don't want
+# to over-escape and produce ugly output for the common case.
+_MARKDOWN_SPECIAL = ("\\", "*", "_", "`", "[", "]", "<", ">")
+
+
+def _md_escape(s):
+    """Backslash-escape markdown-significant chars in a string. Used so a
+    trigger like `*"hot tip"*` doesn't render as bold. Backslash MUST be
+    escaped first or it would double-escape subsequent escapes."""
+    for c in _MARKDOWN_SPECIAL:
+        s = s.replace(c, "\\" + c)
+    return s
+
+
+def _require_personas(personas_meta, fn_name):
+    """Generators emit broken output (empty tables, empty `case` bodies)
+    on empty input. Raise loudly instead so callers don't silently produce
+    corrupt files."""
+    if not personas_meta:
+        raise ValueError(
+            f"{fn_name}: personas_meta is empty — at least one persona "
+            f"required to generate this output"
+        )
+
+
+def gen_persona_table(personas_meta, *, link_prefix=""):
+    """Persona | Register | Default flavor | Other flavors — used in
+    README sibling-skills section, docs/personas/index.md, etc.
+
+    `link_prefix` is prepended to `<persona>.md` in the link cell
+    (use `"personas/"` for tables that live one directory above the
+    persona pages).
+    """
+    _require_personas(personas_meta, "gen_persona_table")
+    rows = [
+        "| Persona | Register | Default flavor | Other flavors |",
+        "|---|---|---|---|",
+    ]
+    for persona, meta in personas_meta.items():
+        link = f"[`{persona}`]({link_prefix}{persona}.md)"
+        register = meta["register_short"]  # validated non-empty by load_meta
+        default = f"`{_persona_default_flavor(meta)}`"
+        others = _persona_other_flavors(
+            meta, empty_label="*(single flavor in v1)*"
+        )
+        rows.append(f"| {link} | {register} | {default} | {others} |")
+    return "\n".join(rows)
+
+
+def gen_personas_command_table(personas_meta):
+    """Plain table (no links, no register column) for commands/personas.md."""
+    _require_personas(personas_meta, "gen_personas_command_table")
+    rows = [
+        "| Persona | Default flavor | Other flavors |",
+        "|---|---|---|",
+    ]
+    for persona, meta in personas_meta.items():
+        default = f"`{_persona_default_flavor(meta)}`"
+        others = _persona_other_flavors(
+            meta, empty_label="(single flavor in v1)"
+        )
+        rows.append(f"| `{persona}` | {default} | {others} |")
+    return "\n".join(rows)
+
+
+def gen_slash_commands_table(personas_meta):
+    """| Command | Effect | rows for each persona's slash command + the
+    /chrysippus:personas listing command."""
+    _require_personas(personas_meta, "gen_slash_commands_table")
+    rows = ["| Command | Effect |", "|---|---|"]
+    for persona in personas_meta:
+        rows.append(
+            f"| `/chrysippus:{persona}` | "
+            f"Activate {persona} for this session |"
+        )
+    rows.append(
+        "| `/chrysippus:personas` | "
+        "List installed personas; show which is active |"
+    )
+    return "\n".join(rows)
+
+
+def gen_subagents_table(personas_meta):
+    """| Subagent | Purpose | rows for each <persona>-reviewer + dramaturg."""
+    _require_personas(personas_meta, "gen_subagents_table")
+    rows = ["| Subagent | Purpose |", "|---|---|"]
+    for persona in personas_meta:
+        rows.append(
+            f"| `{persona}-reviewer` | "
+            f"PR / branch review in {persona} voice |"
+        )
+    rows.append(
+        "| `dramaturg` | Meta-agent — audits persona rule-adherence |"
+    )
+    return "\n".join(rows)
+
+
+def gen_trigger_phrases_list(personas_meta):
+    """Bullet list, one per persona:
+        - **Persona-Title**: *"phrase"*, *"phrase"*, `/slash`.
+    Slash triggers (starting with /) get backticks; others get italic
+    quotes with markdown-special characters backslash-escaped.
+    """
+    _require_personas(personas_meta, "gen_trigger_phrases_list")
+    lines = []
+    for persona, meta in personas_meta.items():
+        title = _persona_title(persona)
+        formatted = []
+        for t in meta["triggers"]:
+            if t.startswith("/"):
+                # Inside backticks no escaping needed (code spans are literal)
+                formatted.append(f"`{t}`")
+            else:
+                formatted.append(f'*"{_md_escape(t)}"*')
+        lines.append(f"- **{title}**: {', '.join(formatted)}.")
+    return "\n".join(lines)
+
+
+def gen_cp_skills_block(personas_meta, dest, *, src_prefix="/tmp/chrysippus"):
+    """One `cp -r` line per persona, copying the rendered skill folder into
+    `dest`. Used in install docs to replace brace-expanded one-liners."""
+    _require_personas(personas_meta, "gen_cp_skills_block")
+    lines = []
+    for persona in personas_meta:
+        lines.append(
+            f"cp -r {src_prefix}/.claude/skills/{persona} {dest}"
+        )
+    return "\n".join(lines)
+
+
+def gen_hooks_allow_list(personas_meta):
+    """Pipe-separated alternation for the bash `case` statement in
+    hooks/activate.sh and hooks/session-start.sh:
+        shakespeare|pirate|gen-alpha|toronto-mans|ontario-bud
+
+    An empty result would be a bash syntax error in `case` — guard against it.
+    """
+    _require_personas(personas_meta, "gen_hooks_allow_list")
+    return "|".join(personas_meta.keys())
+
+
+def gen_dramaturg_skills(personas_meta):
+    """YAML inline-list for agents/dramaturg.md frontmatter:
+        [shakespeare, pirate, gen-alpha, toronto-mans, ontario-bud]
+    """
+    _require_personas(personas_meta, "gen_dramaturg_skills")
+    return "[" + ", ".join(personas_meta.keys()) + "]"
+
+
+def gen_personas_catalog_index_body(personas_meta):
+    """Body of docs/personas/index.md — featured table first, then a
+    Catalog section if any non-featured personas exist."""
+    featured = featured_personas(personas_meta)
+    catalog = catalog_personas(personas_meta)
+
+    parts = [gen_persona_table(featured)]
+    if catalog:
+        parts.extend([
+            "",
+            "## Catalog (additional personas)",
+            "",
+            "These personas are installed but not featured on the landing"
+            " demos.",
+            "",
+            gen_persona_table(catalog),
+        ])
+    return "\n".join(parts)
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Full-file generators — commands/personas.md, agents/dramaturg.md
+# ────────────────────────────────────────────────────────────────────────────
+#
+# These files are short and almost-entirely persona-driven, so we template
+# them whole. Both live in directories that also contain hand-written
+# per-persona files (commands/<persona>.md, agents/<persona>-reviewer.md),
+# so we register them as text_outputs but do NOT add their parent dirs to
+# MANAGED_OUTPUT_DIRS — the orphan-check would flag the hand-written files.
+#
+# Body templates live in scripts/templates/ — moving them out of Python
+# string literals keeps prose edits in plain markdown (reviewable as a
+# normal diff) and avoids accidental \-escape bugs.
+
+def _expand_template(text, **vars):
+    """Tiny mustache-style expansion: {{key}} → value. Used so templates
+    written in plain markdown can host a few persona-driven slots without
+    needing str.format's brace-doubling rules."""
+    for key, value in vars.items():
+        text = text.replace("{{" + key + "}}", value)
+    return text
+
+
+def _load_template(name):
+    return (TEMPLATES_DIR / name).read_text(encoding="utf-8")
+
+
+def render_personas_command_md(personas_meta):
+    return _expand_template(
+        _load_template("personas-command.md"),
+        table=gen_personas_command_table(personas_meta),
+    )
+
+
+def render_dramaturg_md(personas_meta):
+    return _expand_template(
+        _load_template("dramaturg.md"),
+        skills=gen_dramaturg_skills(personas_meta),
     )
 
 

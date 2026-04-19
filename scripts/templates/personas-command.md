@@ -8,13 +8,7 @@ fully deactivate any active persona for the rest of the session.
 
 Currently installed personas:
 
-| Persona | Default flavor | Other flavors |
-|---|---|---|
-| `gen-alpha` | `unhinged` | `corporate`, `tutorial` |
-| `ontario-bud` | `bud` | (single flavor in v1) |
-| `pirate` | `scurvy-dog` | `captain`, `drunk`, `shanty` |
-| `shakespeare` | `courtly` | `tavern`, `sonnet` |
-| `toronto-mans` | `mans` | (single flavor in v1) |
+{{table}}
 
 Trigger each with `/chrysippus:<persona>` or its natural-language trigger
 phrases. See `.claude/skills/<persona>/SKILL.md` for full rules.

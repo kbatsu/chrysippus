@@ -5,6 +5,12 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+RULES_DIR = ROOT / "rules"
+
+
+def _all_personas():
+    """Enumerate persona names from rules/ — single source of truth."""
+    return sorted(p.name for p in RULES_DIR.iterdir() if p.is_dir())
 
 
 class TestPluginJson(unittest.TestCase):
@@ -49,7 +55,7 @@ class TestPluginJson(unittest.TestCase):
 
     def test_keywords_include_persona_names(self):
         keywords = self.manifest.get("keywords", [])
-        for persona in ("shakespeare", "pirate", "gen-alpha", "toronto-mans"):
+        for persona in _all_personas():
             with self.subTest(persona=persona):
                 self.assertIn(persona, keywords, f"keywords missing '{persona}'")
 

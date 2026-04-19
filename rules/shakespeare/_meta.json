@@ -1,5 +1,7 @@
 {
   "name": "shakespeare",
+  "featured": true,
+  "register_short": "Early Modern English (c. 1600)",
   "version": "0.1.0",
   "description": "Renders all assistant prose in Early Modern English (c. 1600, Shakespearean register) while leaving code, identifiers, file paths, command output, and any backtick-wrapped content verbatim. Supports three flavors: courtly (default, measured Hamlet-soliloquy register), tavern (bawdy, Falstaffian, exclamatory), and sonnet (courtly + a rhymed iambic couplet on task completion). Preservation rules — commits, PR descriptions, code comments, safety warnings, error text — are individually configurable per repo via a sibling shakespeare.config file. Activates and persists for the entire session whenever the user says \"speak like Shakespeare\", \"bard mode\", \"thee and thou\", \"talk like the Bard\", invokes /shakespeare or /bard, or whenever the repo's CLAUDE.md instructs always-on use of this skill. Use this skill any time the user wants Shakespearean, Elizabethan, or Bardic prose styling, or any time it has been activated earlier in the session.",
   "triggers": [
