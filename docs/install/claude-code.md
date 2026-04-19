@@ -12,9 +12,9 @@ claude plugin install chrysippus@kbatsu-plugins
 
 Two commands. You now have:
 
-- Five persona skills (auto-discovered under `.claude/skills/`)
-- Six slash commands (`/chrysippus:<persona>` + `/chrysippus:personas`)
-- Six subagents (five `<persona>-reviewer` + `dramaturg`)
+- Persona skills (auto-discovered under `.claude/skills/`)
+- A slash command per persona (`/chrysippus:<persona>`) plus `/chrysippus:personas`
+- A reviewer subagent per persona plus the `dramaturg` meta-agent
 - One `SessionStart` hook (opt-in per project)
 
 ## Per-repo manual install
@@ -25,7 +25,13 @@ If you'd rather copy the skills in by hand:
 cd your-project
 mkdir -p .claude/skills
 git clone https://github.com/kbatsu/chrysippus /tmp/chrysippus
-cp -r /tmp/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans,ontario-bud} .claude/skills/
+<!-- chrysippus:cp-skills-per-repo BEGIN -->
+cp -r /tmp/chrysippus/.claude/skills/gen-alpha .claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/ontario-bud .claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/pirate .claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/shakespeare .claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/toronto-mans .claude/skills/
+<!-- chrysippus:cp-skills-per-repo END -->
 ```
 
 For always-on activation in this repo, append to `CLAUDE.md`:
@@ -47,7 +53,13 @@ preservation toggles.
 ```bash
 mkdir -p ~/.claude/skills
 git clone https://github.com/kbatsu/chrysippus /tmp/chrysippus
-cp -r /tmp/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans,ontario-bud} ~/.claude/skills/
+<!-- chrysippus:cp-skills-user-global BEGIN -->
+cp -r /tmp/chrysippus/.claude/skills/gen-alpha ~/.claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/ontario-bud ~/.claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/pirate ~/.claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/shakespeare ~/.claude/skills/
+cp -r /tmp/chrysippus/.claude/skills/toronto-mans ~/.claude/skills/
+<!-- chrysippus:cp-skills-user-global END -->
 ```
 
 ## Enabling the auto-activation hook
@@ -75,15 +87,19 @@ SessionStart hook reads it and injects activation instructions.
 
 ## Slash commands
 
+<!-- chrysippus:slash-commands-table BEGIN -->
 | Command | Effect |
 |---|---|
+| `/chrysippus:gen-alpha` | Activate gen-alpha for this session |
+| `/chrysippus:ontario-bud` | Activate ontario-bud for this session |
+| `/chrysippus:pirate` | Activate pirate for this session |
 | `/chrysippus:shakespeare` | Activate shakespeare for this session |
-| `/chrysippus:shakespeare sonnet` | Activate with sonnet flavor |
-| `/chrysippus:pirate` | Activate pirate |
-| `/chrysippus:gen-alpha` | Activate gen-alpha |
-| `/chrysippus:toronto-mans` | Activate toronto-mans |
-| `/chrysippus:ontario-bud` | Activate ontario-bud |
+| `/chrysippus:toronto-mans` | Activate toronto-mans for this session |
 | `/chrysippus:personas` | List installed personas; show which is active |
+<!-- chrysippus:slash-commands-table END -->
+
+Pass a flavor argument to activate with that flavor from the start —
+e.g. `/chrysippus:shakespeare sonnet`, `/chrysippus:pirate shanty`.
 
 Every persona activation also announces the active flavor, the other
 flavors, and how to switch/stop — so first-time users don't need to open
@@ -95,13 +111,21 @@ flavor switch) are natural-language triggers in the skill itself.
 
 ## Subagents
 
-Six subagents are installed:
+The plugin installs subagents:
 
-- `shakespeare-reviewer`, `pirate-reviewer`, `gen-alpha-reviewer`,
-  `toronto-mans-reviewer`, `ontario-bud-reviewer` — code review in the
-  persona's voice, with substantive technical feedback.
-- `dramaturg` — meta-agent that audits persona rule-adherence. Speaks
-  plainly itself.
+<!-- chrysippus:subagents-table BEGIN -->
+| Subagent | Purpose |
+|---|---|
+| `gen-alpha-reviewer` | PR / branch review in gen-alpha voice |
+| `ontario-bud-reviewer` | PR / branch review in ontario-bud voice |
+| `pirate-reviewer` | PR / branch review in pirate voice |
+| `shakespeare-reviewer` | PR / branch review in shakespeare voice |
+| `toronto-mans-reviewer` | PR / branch review in toronto-mans voice |
+| `dramaturg` | Meta-agent — audits persona rule-adherence |
+<!-- chrysippus:subagents-table END -->
+
+The reviewers each load their persona's skill from frontmatter; the
+dramaturg speaks plainly itself.
 
 Invoke with an `@`-mention (plugin-namespaced):
 

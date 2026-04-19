@@ -37,12 +37,15 @@ Each agent's install page covers both models.
 
 ## After installing
 
-Trigger any persona with its phrase:
+Trigger any persona with one of its phrases:
 
-- *"speak like Shakespeare"* / `/chrysippus:shakespeare`
-- *"talk like a pirate"* / `/chrysippus:pirate`
-- *"talk like gen alpha"* / `/chrysippus:gen-alpha`
-- *"talk like a toronto mans"* / `/chrysippus:toronto-mans`
+<!-- chrysippus:trigger-phrases BEGIN -->
+- **Gen-Alpha**: *"talk like gen alpha"*, *"gen alpha mode"*, *"go skibidi"*, *"skibidi mode"*, `/gen-alpha`, `/genalpha`.
+- **Ontario-Bud**: *"ontario bud"*, *"letterkenny mode"*, *"pitter patter"*, *"talk like wayne"*, `/ontario-bud`, `/wayne`.
+- **Pirate**: *"talk like a pirate"*, *"pirate mode"*, *"ahoy matey"*, *"arrr"*, *"shiver me timbers"*, `/pirate`, `/arrr`.
+- **Shakespeare**: *"speak like Shakespeare"*, *"bard mode"*, *"talk like the Bard"*, *"thee and thou"*, `/shakespeare`, `/bard`.
+- **Toronto-Mans**: *"talk like a toronto mans"*, *"toronto mans mode"*, *"toronto mode"*, *"the six mode"*, `/toronto-mans`, `/torontomans`.
+<!-- chrysippus:trigger-phrases END -->
 
 Deactivate with *"stop &lt;persona&gt;"* or *"speak plainly"*.
 

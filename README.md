@@ -13,7 +13,7 @@ Portable persona skills for AI coding agents that change the register of
 the agent's prose while leaving code, file paths, command output, error
 text, and anything inside backticks verbatim.
 
-Five persona skills ship from this repo:
+Persona skills ship from this repo:
 
 - **`shakespeare`** — Early Modern English (c. 1600, Bardic register).
 - **`pirate`** — Treasure Island / Pirates-of-the-Caribbean register.
@@ -80,84 +80,15 @@ deployed automatically by `.github/workflows/docs.yml` on every push to
 
 ## Demo
 
-### Shakespeare
+> **Plain**: *"I read the file. Found three TODOs. Want me to address them now?"*
+>
+> **Bardic** (`shakespeare`): *"I have perused the scroll, and lo — three
+> TODOs lie scattered therein. Prithee, sir, shall I set hand to them
+> anon?"*
 
-> **Plain Claude:**
-> *"I read the file. Found three TODOs. Want me to address them now?"*
-
-> **Bardic Claude (courtly flavor):**
-> *"I have perused the scroll, and lo — three TODOs lie scattered therein.
-> Prithee, sir, shall I set hand to them anon?"*
-
-> **Bardic Claude (tavern flavor):**
-> *"Hark! Three TODOs lurk within yon scroll like rogues in an alley.
-> Speak the word, and I shall rout them all!"*
-
-> **Bardic Claude (sonnet flavor — only on task completion):**
-> *"Three tests are writ, the bug on line is slain,*
-> *No crimson error mars the verdant plain."*
-
-### Pirate
-
-> **Plain Claude:**
-> *"I read the file. Found three TODOs. Want me to address them now?"*
-
-> **Pirate Claude (scurvy-dog flavor):**
-> *"Aye, hauled up the scroll. Three TODOs lurkin' below decks, matey.
-> Speak the word and I'll rout 'em."*
-
-> **Pirate Claude (captain flavor):**
-> *"The scroll is read. Three TODOs await. Thy orders, sir."*
-
-> **Pirate Claude (drunk flavor):**
-> *"YARRRR, three TODOs skulkin' below decks! Pour the rum and give the
-> order — we'll run 'em through afore sundown!"*
-
-> **Pirate Claude (shanty flavor — only on task completion):**
-> *"Three tests writ, the bug be slain,*
-> *Cannons silent, calm the main,*
-> *Hoist the colors, drink yer rum,*
-> *Cap'n's pleased — the work be done!"*
-
-### Gen-Alpha
-
-> **Plain Claude:**
-> *"I read the file. Found three TODOs. Want me to address them now?"*
-
-> **Gen-Alpha Claude (unhinged flavor):**
-> *"read the file. 3 TODOs in there. wild. want me to handle 'em rq?"*
-
-> **Gen-Alpha Claude (corporate flavor):**
-> *"Per my last review, three TODOs were located. The plan, lowkey, is to
-> ratify them — pending your call."*
-
-> **Gen-Alpha Claude (tutorial flavor — glosses on first use):**
-> *"read the file. 3 TODOs in there. wild. want me to handle 'em rq (= right
-> quick)?"*
-
-> *Made by Gen-Zs and millennials. Not endorsed by or representative of
-> actual Gen Alpha.*
-
-### Toronto-mans
-
-> **Plain Claude:**
-> *"I read the file. Found three TODOs. Want me to address them now?"*
-
-> **Toronto-mans Claude (mans flavor):**
-> *"Mans done read the scroll fam. 3 TODOs in there still, bare simple to
-> clean up no cap. Say the word and mandem will handle 'em."*
-
-> *This skill is a fictional caricature, not a dialect. It borrows
-> substantially from **Multicultural Toronto English (MTE)**, **Jamaican
-> Patois**, and **African American Vernacular English (AAVE)** — none of
-> the vocabulary originated in Toronto. Per-term provenance is documented
-> in `.claude/skills/toronto-mans/lexicon.md`. The `safety_warnings`
-> preservation toggle is hard-locked on and cannot be disabled.
-> Excluded from the lexicon: fake-accent respellings of standard English
-> words, all Patois expletives, gang-coded neighborhood names, real-person
-> references (Drake, etc.), brand references (Tim Hortons, Raptors, etc.),
-> gang/drug/violence references, slurs. See `SKILL.md` §7 for the full
-> stereotype-drift guardrails.*
+Same prompt rendered in every persona's voice (with multiple flavors per
+persona) lives on the docs site:
+**[Full demos for each persona →](https://kbatsu.github.io/chrysippus/personas/)**.
 
 ## Sibling skills
 
@@ -165,13 +96,15 @@ All skills share the same architecture: a self-contained folder with
 `SKILL.md`, a `*.config` file for per-repo settings, and an `examples.md`
 corpus. They are installed and activated independently.
 
-| Skill | Register | Default flavor | Other flavors |
+<!-- chrysippus:sibling-skills-table BEGIN -->
+| Persona | Register | Default flavor | Other flavors |
 |---|---|---|---|
-| `shakespeare` | Early Modern English | `courtly` | `tavern`, `sonnet` |
-| `pirate` | 18c. maritime caricature | `scurvy-dog` | `captain`, `drunk`, `shanty` |
-| `gen-alpha` | internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
-| `toronto-mans` | Toronto / MTE caricature (Patois + AAVE borrows) | `mans` | (single flavor in v1) |
-| `ontario-bud` | rural-Ontario / Letterkenny-inspired caricature | `bud` | (single flavor in v1) |
+| [`gen-alpha`](docs/personas/gen-alpha.md) | Internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
+| [`ontario-bud`](docs/personas/ontario-bud.md) | Rural-Ontario / Letterkenny-inspired caricature | `bud` | *(single flavor in v1)* |
+| [`pirate`](docs/personas/pirate.md) | Treasure Island / POTC 17–18c. maritime | `scurvy-dog` | `captain`, `drunk`, `shanty` |
+| [`shakespeare`](docs/personas/shakespeare.md) | Early Modern English (c. 1600) | `courtly` | `tavern`, `sonnet` |
+| [`toronto-mans`](docs/personas/toronto-mans.md) | Toronto / Multicultural-Toronto-English caricature | `mans` | *(single flavor in v1)* |
+<!-- chrysippus:sibling-skills-table END -->
 
 If more than one is activated in the same session, the most recently
 invoked one wins — no fusion or blending.
@@ -187,7 +120,7 @@ claude plugin marketplace add kbatsu/chrysippus
 claude plugin install chrysippus@kbatsu-plugins
 ```
 
-This installs the plugin — all five personas, the slash commands, the
+This installs the plugin — all personas, the slash commands, the
 reviewer subagents, and the SessionStart hook — into your user-global
 Claude Code settings. To enable auto-activation of a persona for a
 specific project:
@@ -207,23 +140,14 @@ Copy the skill folder(s) you want into the target repo's
 # from your target repo's root
 mkdir -p .claude/skills
 
-# just shakespeare
-cp -r /path/to/chrysippus/.claude/skills/shakespeare .claude/skills/
-
-# just pirate
-cp -r /path/to/chrysippus/.claude/skills/pirate .claude/skills/
-
-# just gen-alpha
-cp -r /path/to/chrysippus/.claude/skills/gen-alpha .claude/skills/
-
-# just toronto-mans
-cp -r /path/to/chrysippus/.claude/skills/toronto-mans .claude/skills/
-
-# just ontario-bud
-cp -r /path/to/chrysippus/.claude/skills/ontario-bud .claude/skills/
-
 # or all of them
-cp -r /path/to/chrysippus/.claude/skills/{shakespeare,pirate,gen-alpha,toronto-mans,ontario-bud} .claude/skills/
+<!-- chrysippus:cp-skills-per-repo BEGIN -->
+cp -r /path/to/chrysippus/.claude/skills/gen-alpha .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/ontario-bud .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/pirate .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/shakespeare .claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/toronto-mans .claude/skills/
+<!-- chrysippus:cp-skills-per-repo END -->
 ```
 
 Or as a git submodule, or by cloning this repo and symlinking — whichever
@@ -235,11 +159,13 @@ Copy the folder(s) into your personal Claude Code skills directory:
 
 ```bash
 mkdir -p ~/.claude/skills
-cp -r /path/to/chrysippus/.claude/skills/shakespeare ~/.claude/skills/
-cp -r /path/to/chrysippus/.claude/skills/pirate ~/.claude/skills/
+<!-- chrysippus:cp-skills-user-global BEGIN -->
 cp -r /path/to/chrysippus/.claude/skills/gen-alpha ~/.claude/skills/
-cp -r /path/to/chrysippus/.claude/skills/toronto-mans ~/.claude/skills/
 cp -r /path/to/chrysippus/.claude/skills/ontario-bud ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/pirate ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/shakespeare ~/.claude/skills/
+cp -r /path/to/chrysippus/.claude/skills/toronto-mans ~/.claude/skills/
+<!-- chrysippus:cp-skills-user-global END -->
 ```
 
 ## Activation
@@ -251,16 +177,13 @@ Each skill activates two ways.
 Once a skill's folder is installed, say any of its trigger phrases in a
 session and it loads and persists for the rest of the session:
 
-- **Shakespeare**: *"speak like Shakespeare"*, *"bard mode"*, *"talk like
-  the Bard"*, *"thee and thou"*, `/shakespeare`, `/bard`.
-- **Pirate**: *"talk like a pirate"*, *"pirate mode"*, *"ahoy matey"*,
-  *"arrr"*, *"shiver me timbers"*, `/pirate`, `/arrr`.
-- **Gen-Alpha**: *"talk like gen alpha"*, *"gen alpha mode"*, *"go
-  skibidi"*, *"skibidi mode"*, `/gen-alpha`, `/genalpha`.
-- **Toronto-mans**: *"talk like a toronto mans"*, *"toronto mans mode"*,
-  *"toronto mode"*, *"the six mode"*, `/toronto-mans`, `/torontomans`.
-- **Ontario-bud**: *"ontario bud"*, *"letterkenny mode"*, *"pitter
-  patter"*, *"talk like wayne"*, `/ontario-bud`, `/wayne`.
+<!-- chrysippus:trigger-phrases BEGIN -->
+- **Gen-Alpha**: *"talk like gen alpha"*, *"gen alpha mode"*, *"go skibidi"*, *"skibidi mode"*, `/gen-alpha`, `/genalpha`.
+- **Ontario-Bud**: *"ontario bud"*, *"letterkenny mode"*, *"pitter patter"*, *"talk like wayne"*, `/ontario-bud`, `/wayne`.
+- **Pirate**: *"talk like a pirate"*, *"pirate mode"*, *"ahoy matey"*, *"arrr"*, *"shiver me timbers"*, `/pirate`, `/arrr`.
+- **Shakespeare**: *"speak like Shakespeare"*, *"bard mode"*, *"talk like the Bard"*, *"thee and thou"*, `/shakespeare`, `/bard`.
+- **Toronto-Mans**: *"talk like a toronto mans"*, *"toronto mans mode"*, *"toronto mode"*, *"the six mode"*, `/toronto-mans`, `/torontomans`.
+<!-- chrysippus:trigger-phrases END -->
 
 ### 2. Always-on via CLAUDE.md (recommended for dedicated repos)
 

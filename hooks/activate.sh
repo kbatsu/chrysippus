@@ -53,7 +53,9 @@ if [[ $# -ne 1 ]]; then
 fi
 
 case "$1" in
-  shakespeare|pirate|gen-alpha|toronto-mans|ontario-bud)
+# chrysippus:allow-list BEGIN
+  gen-alpha|ontario-bud|pirate|shakespeare|toronto-mans)
+# chrysippus:allow-list END
     mkdir -p "${STATE_DIR}"
     printf '%s\n' "$1" > "${STATE_FILE}"
     echo "${PROGNAME}: auto-activation enabled for persona '$1'"

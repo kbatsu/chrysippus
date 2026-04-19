@@ -37,7 +37,9 @@ fi
 # Validate against allow-list. Reject anything else silently — the state
 # file is not a place for arbitrary input.
 case "${active}" in
-  shakespeare|pirate|gen-alpha|toronto-mans|ontario-bud)
+# chrysippus:allow-list BEGIN
+  gen-alpha|ontario-bud|pirate|shakespeare|toronto-mans)
+# chrysippus:allow-list END
     ;;
   *)
     # Unknown persona name — log once to stderr and exit cleanly.

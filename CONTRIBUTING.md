@@ -16,11 +16,30 @@ buckets: bug fixes, lexicon updates, and new personas.
 
 ## Source-of-truth pattern
 
-The canonical persona content lives in `rules/<persona>/`. The files at
-`.claude/skills/<persona>/`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/`,
-`.windsurfrules`, `CONVENTIONS.md`, and `.clinerules` are **generated** by
-`scripts/render.py`. Do not edit them by hand — your changes will be
-overwritten on the next render.
+The canonical persona content lives in `rules/<persona>/`. The generator
+at `scripts/render.py` produces three classes of output:
+
+1. **Fully generated files** (every byte rendered):
+   `.claude/skills/<persona>/`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/`,
+   `.windsurfrules`, `CONVENTIONS.md`, `.clinerules`, `commands/personas.md`,
+   `agents/dramaturg.md`. Do not edit by hand — your changes will be
+   overwritten on the next render.
+
+2. **Marker-injected zones** in mostly-hand-written files. Look for
+   marker comments like `<!-- chrysippus:<id> BEGIN -->` /
+   `<!-- chrysippus:<id> END -->` (HTML-comment style for `.md`/`.mdc`
+   files; `# chrysippus:<id> BEGIN` for shell/YAML). Content **between**
+   the markers is auto-generated; content **outside** the markers is
+   yours to edit. Files with marker zones today: `README.md`,
+   `docs/index.md`, `docs/personas/index.md`, `docs/subagents.md`,
+   `docs/install/claude-code.md`, `docs/install/index.md`,
+   `hooks/activate.sh`, `hooks/session-start.sh`.
+
+3. **Hand-written files** (untouched by the generator):
+   `commands/<persona>.md`, `agents/<persona>-reviewer.md`,
+   `docs/personas/<persona>.md`, `CLAUDE.md`, `CONTRIBUTING.md`, etc.
+   When you add a new persona, create the per-persona ones manually
+   (the test suite enforces their existence).
 
 After editing anything in `rules/`, run:
 
@@ -28,11 +47,12 @@ After editing anything in `rules/`, run:
 scripts/render.py
 ```
 
-CI runs `scripts/render.py --check` and will fail your PR if generated files
-drift from source.
+CI runs `scripts/render.py --check` and will fail your PR if generated
+files drift from source OR if a marker zone in a consumer file no longer
+matches what the generator would produce.
 
-The generator is Python 3.10+ stdlib-only (no PyPI dependencies). To run it
-locally you need only a Python interpreter.
+The generator is Python 3.10+ stdlib-only (no PyPI dependencies). To run
+it locally you need only a Python interpreter.
 
 ## Bug fixes
 
@@ -55,14 +75,70 @@ For each term:
 
 ## Adding a new persona
 
-1. Discuss in an issue first — we'd rather not have ten half-baked personas.
-2. Create `rules/<new-persona>/_meta.yml` and `rules/<new-persona>/instructions.md`
-   following the pattern of existing personas.
-3. Include a `## Stereotype-drift guardrail` section in `instructions.md`
-   listing what the persona must **never** do, with reasons.
-4. Add at least 5 worked before/after examples for completion summaries.
-5. Run `scripts/render.py` and commit the regenerated outputs.
-6. Update `README.md` with a demo block.
+New personas default to **catalog tier** (`featured: false` in
+`_meta.json`) — they appear in tables and dropdowns but not in the
+landing-page demos. Promotion to **featured tier** is a maintainer act
+that requires hand-writing demo prose. The cap on featured personas is 5.
+
+### Catalog-tier persona (default)
+
+Touch only these files. Everything else (README tables, install pages,
+slash commands, subagent reviewers, hooks allow-list, dramaturg skills
+list, `commands/personas.md`) auto-updates when you run
+`scripts/render.py`.
+
+1. **Discuss in an issue first** — we'd rather not have ten half-baked
+   personas.
+2. Create `rules/<new-persona>/_meta.json` with required fields:
+   `name`, `version`, `description`, `register_short` (one-line summary
+   used in tables), `triggers` (non-empty list), `flavors` (non-empty
+   list with exactly one having `"default": true`), `preserve_defaults`.
+   Optional: `featured` (default `false`), `preserve_locked`,
+   `config_extra_notes`. `load_meta()` validates the schema and fails
+   loudly on typos.
+3. Create `rules/<new-persona>/instructions.md` — full register rules.
+   Include a `## Stereotype-drift guardrail` section listing what the
+   persona must **never** do, with reasons.
+4. Create `rules/<new-persona>/examples.md` — at least 5 worked
+   before/after examples.
+5. (optional) Create `rules/<new-persona>/lexicon.md` if the persona
+   borrows specific vocabulary that benefits from per-term provenance.
+6. Create `commands/<new-persona>.md` — the slash-command activation
+   file. Hand-written because it carries register-specific guidance
+   (lexicon mentions, hard-locks, danger-combo notes, etc.). Follow
+   the pattern of any existing command file.
+7. Create `agents/<new-persona>-reviewer.md` — the reviewer subagent.
+   Hand-written for the same reason. Frontmatter must include
+   `skills: [<new-persona>]`. The `TestHandWrittenPerPersonaFiles`
+   test in `tests/test_render.py` enforces (6) and (7).
+8. Create `docs/personas/<new-persona>.md` — the per-persona docs page.
+9. Add one nav line to `mkdocs.yml` under `Personas:`.
+10. Run `scripts/render.py` to regenerate everything else and run
+    `scripts/ci.sh`.
+11. Commit. CI gates: `scripts/render.py --check` (drift) +
+    `scripts/ci.sh` (tests + JSON + shell syntax).
+
+### Promotion to featured tier (maintainer-only)
+
+Featured personas appear in the landing-page demo blockquotes
+(`docs/index.md`) and any per-persona prose blocks elsewhere. The
+landing demos are hand-written featured-only prose — they're not
+auto-generated.
+
+To promote a catalog persona to featured:
+
+1. Confirm the cap (≤5 featured) — current featured set:
+   `shakespeare`, `pirate`, `gen-alpha`, `toronto-mans`, `ontario-bud`.
+   If at the cap, demote another persona first (set `featured: false`
+   and remove its hand-written demo prose from `docs/index.md` and
+   `README.md`).
+2. Set `"featured": true` in `rules/<persona>/_meta.json`.
+3. Hand-write demo prose for `docs/index.md` Demo 1 (self-introduction)
+   and Demo 2 (bug review) blockquotes.
+4. Run `scripts/render.py` and verify the persona appears in landing
+   tables.
+5. CLAUDE.md is hand-edited; if the new persona is auto-activated in
+   this repo, update CLAUDE.md's "Communication style" section.
 
 ## Commit messages
 

@@ -4,7 +4,7 @@
 > (c. 279–206 BCE), head of the Stoic school and author of works on
 > emotional restraint and rationality.*
 
-Five persona skills for AI coding agents. Same prompt, five voices,
+Persona skills for AI coding agents. Same prompt, multiple voices,
 identical code output.
 
 Works with: **Claude Code** (first-class plugin) · **Codex** · **Cursor** ·
@@ -94,15 +94,17 @@ Done. The Bard greets you.
 For other agents, see the [install guide](install/index.md) — each agent
 has its own one-line setup.
 
-## The five personas
+## Personas
 
-| Persona | Register | Flavors |
-|---|---|---|
-| [`shakespeare`](personas/shakespeare.md) | Early Modern English (c. 1600, Bardic) | `courtly`, `tavern`, `sonnet` |
-| [`pirate`](personas/pirate.md) | Treasure Island / Pirates-of-the-Caribbean | `scurvy-dog`, `captain`, `drunk`, `shanty` |
-| [`gen-alpha`](personas/gen-alpha.md) | Internet-native ironic Gen-Alpha slang | `unhinged`, `corporate`, `tutorial` |
-| [`toronto-mans`](personas/toronto-mans.md) | Toronto / MTE caricature (with attribution) | `mans` |
-| [`ontario-bud`](personas/ontario-bud.md) | Rural-Ontario / Letterkenny-inspired caricature | `bud` |
+<!-- chrysippus:personas-table BEGIN -->
+| Persona | Register | Default flavor | Other flavors |
+|---|---|---|---|
+| [`gen-alpha`](personas/gen-alpha.md) | Internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
+| [`ontario-bud`](personas/ontario-bud.md) | Rural-Ontario / Letterkenny-inspired caricature | `bud` | *(single flavor in v1)* |
+| [`pirate`](personas/pirate.md) | Treasure Island / POTC 17–18c. maritime | `scurvy-dog` | `captain`, `drunk`, `shanty` |
+| [`shakespeare`](personas/shakespeare.md) | Early Modern English (c. 1600) | `courtly` | `tavern`, `sonnet` |
+| [`toronto-mans`](personas/toronto-mans.md) | Toronto / Multicultural-Toronto-English caricature | `mans` | *(single flavor in v1)* |
+<!-- chrysippus:personas-table END -->
 
 ## What's preserved regardless of active persona
 
@@ -120,7 +122,7 @@ has its own one-line setup.
   flavor matrix, and register-specific guardrails.
 - **[Configuration](configuration.md)** — the config-file model,
   preservation toggles, hard-locks, reload mechanics.
-- **[Subagents](subagents.md)** — the 5 per-persona reviewers + the
+- **[Subagents](subagents.md)** — the per-persona reviewers + the
   dramaturg meta-agent: what they do and how to invoke them.
 - **[Recipes](recipes.md)** — worked examples for common tasks
   ("Bardic prose but plain commits", "full pirate git history", etc.).

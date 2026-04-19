@@ -2,7 +2,7 @@
 
 Codex, Cline, and other AI coding agents that follow the `AGENTS.md`
 convention read a single `AGENTS.md` file at the project root.
-`chrysippus` ships a concatenated `AGENTS.md` with all five personas.
+`chrysippus` ships a concatenated `AGENTS.md` with all installed personas.
 
 ## Per-project install
 

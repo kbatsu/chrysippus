@@ -356,6 +356,119 @@ def main(argv=None):
     return do_render(personas, out_root)
 
 
+# ────────────────────────────────────────────────────────────────────────────
+# Consumer-file marker injection registry
+# ────────────────────────────────────────────────────────────────────────────
+#
+# Each entry: (relative_file_path, marker_id, generator_callable)
+#   - relative_file_path: file in the live repo (relative to ROOT).
+#   - marker_id: matches MARKER_ID_RE and is the id used in the file's
+#     <!-- chrysippus:<id> BEGIN/END --> markers (or # equivalents).
+#   - generator_callable: takes personas_meta dict, returns string for
+#     the zone interior.
+#
+# IMPORTANT: marker comments must be flush-left (column 0) in source
+# files — the regex preserves text BEFORE the BEGIN marker but rewrites
+# everything from BEGIN through END. An indented BEGIN with an indented
+# END would have the END's indentation lost on each render. See N4
+# review fix.
+
+def _allow_list_pattern(personas_meta):
+    """Generate the bash case-pattern line for hooks/activate.sh and
+    hooks/session-start.sh. Two-space indented to match surrounding case
+    body style; trailing `)` closes the case pattern."""
+    return f"  {gen_hooks_allow_list(personas_meta)})"
+
+
+# Registry entries reference gen_* functions defined later in the file.
+# Lambdas defer name lookup to call time, so the registry can be defined
+# here (alongside the inject/check helpers that consume it) without
+# requiring a forward declaration of every generator.
+
+CONSUMER_MARKER_INJECTIONS = [
+    # hooks/ — bash case allow-list
+    ("hooks/activate.sh", "allow-list",
+        lambda m: _allow_list_pattern(m)),
+    ("hooks/session-start.sh", "allow-list",
+        lambda m: _allow_list_pattern(m)),
+
+    # README.md
+    ("README.md", "sibling-skills-table",
+        lambda m: gen_persona_table(m, link_prefix="docs/personas/")),
+    ("README.md", "trigger-phrases",
+        lambda m: gen_trigger_phrases_list(m)),
+    ("README.md", "cp-skills-per-repo",
+        lambda m: gen_cp_skills_block(
+            m, ".claude/skills/", src_prefix="/path/to/chrysippus")),
+    ("README.md", "cp-skills-user-global",
+        lambda m: gen_cp_skills_block(
+            m, "~/.claude/skills/", src_prefix="/path/to/chrysippus")),
+
+    # docs/index.md (landing — links one level down to personas/)
+    ("docs/index.md", "personas-table",
+        lambda m: gen_persona_table(m, link_prefix="personas/")),
+
+    # docs/personas/index.md (catalog page — sibling links)
+    ("docs/personas/index.md", "personas-table",
+        lambda m: gen_personas_catalog_index_body(m)),
+
+    # docs/subagents.md
+    ("docs/subagents.md", "subagents-table",
+        lambda m: gen_subagents_table(m)),
+
+    # docs/install/
+    ("docs/install/claude-code.md", "slash-commands-table",
+        lambda m: gen_slash_commands_table(m)),
+    ("docs/install/claude-code.md", "subagents-table",
+        lambda m: gen_subagents_table(m)),
+    ("docs/install/claude-code.md", "cp-skills-per-repo",
+        lambda m: gen_cp_skills_block(m, ".claude/skills/")),
+    ("docs/install/claude-code.md", "cp-skills-user-global",
+        lambda m: gen_cp_skills_block(m, "~/.claude/skills/")),
+    ("docs/install/index.md", "trigger-phrases",
+        lambda m: gen_trigger_phrases_list(m)),
+]
+
+
+def inject_consumer_markers(personas_meta, root):
+    """Inject auto-generated content into the marker zones of consumer
+    files. Returns list of relative paths actually rewritten."""
+    modified = []
+    for rel_path, marker_id, gen_fn in CONSUMER_MARKER_INJECTIONS:
+        target = root / rel_path
+        if not target.exists():
+            # Consumer file may not exist when rendering to a fresh tmp.
+            continue
+        content = gen_fn(personas_meta)
+        if inject_marker(target, marker_id, content):
+            modified.append(rel_path)
+    return modified
+
+
+def check_consumer_markers(personas_meta):
+    """Return list of drift descriptions for any consumer marker zone
+    whose content does not match what its generator would produce.
+
+    Operates on files at ROOT directly — these are not under
+    MANAGED_OUTPUT_DIRS and are not rendered to the tmp out_root.
+    """
+    drifts = []
+    for rel_path, marker_id, gen_fn in CONSUMER_MARKER_INJECTIONS:
+        target = ROOT / rel_path
+        if not target.exists():
+            drifts.append(
+                f"  {rel_path}: marker target file is missing"
+            )
+            continue
+        expected = gen_fn(personas_meta)
+        if not check_marker(target, marker_id, expected):
+            drifts.append(
+                f"  {rel_path}#{marker_id}: marker zone drifted "
+                f"(re-run `scripts/render.py` to regenerate)"
+            )
+    return drifts
+
+
 def do_render(personas, out_root):
     personas_meta = {p: load_meta(p) for p in personas}
     text_outputs = build_text_outputs(personas_meta, out_root)
@@ -369,13 +482,21 @@ def do_render(personas, out_root):
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, target)
 
-    total = len(text_outputs) + len(copy_outputs)
+    # Marker injection only runs when rendering to the actual repo
+    # (out_root == ROOT). For --out (tmp dir for tests) the consumer
+    # files don't exist in tmp, so we skip silently.
+    marker_modified = []
+    if out_root == ROOT:
+        marker_modified = inject_consumer_markers(personas_meta, out_root)
+
+    total = len(text_outputs) + len(copy_outputs) + len(marker_modified)
     print(f"rendered {len(personas)} persona(s) to {total} output file(s)")
     return 0
 
 
 def run_check(personas):
-    """Render to a tmp dir; diff each file against committed; exit 1 on drift."""
+    """Render to a tmp dir; diff each file against committed; check marker
+    zones in consumer files; exit 1 on any drift."""
     drifts = []
     with tempfile.TemporaryDirectory() as tmp:
         tmp_root = Path(tmp)
@@ -413,6 +534,12 @@ def run_check(personas):
                 f"  {orphan}: committed but not rendered (stale — "
                 "persona removed from rules/?)"
             )
+
+    # Check marker zones in consumer files (operate on ROOT directly,
+    # not the tmp render — these files live in the repo, not in
+    # MANAGED_OUTPUT_DIRS).
+    personas_meta = {p: load_meta(p) for p in personas}
+    drifts.extend(check_consumer_markers(personas_meta))
 
     if drifts:
         print("DRIFT — generated output does not match committed files:", file=sys.stderr)

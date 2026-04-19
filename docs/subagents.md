@@ -1,9 +1,9 @@
 # Subagents
 
-chrysippus ships five Claude Code subagents in the `agents/` directory of
-the plugin. Four are per-persona code reviewers; one is a meta-agent that
-audits persona adherence. This page covers what they do, when to use
-them, and how to invoke them.
+chrysippus ships Claude Code subagents in the `agents/` directory of the
+plugin. One per persona is a code reviewer in that register; one
+(`dramaturg`) is a meta-agent that audits persona adherence. This page
+covers what they do, when to use them, and how to invoke them.
 
 ## What is a subagent?
 
@@ -29,19 +29,21 @@ Practical differences from the main conversation:
 
 ## What chrysippus ships
 
+<!-- chrysippus:subagents-table BEGIN -->
 | Subagent | Purpose |
 |---|---|
-| `shakespeare-reviewer` | PR / branch review in Bardic voice |
-| `pirate-reviewer` | PR / branch review in pirate voice |
 | `gen-alpha-reviewer` | PR / branch review in gen-alpha voice |
-| `toronto-mans-reviewer` | PR / branch review in toronto-mans voice |
 | `ontario-bud-reviewer` | PR / branch review in ontario-bud voice |
+| `pirate-reviewer` | PR / branch review in pirate voice |
+| `shakespeare-reviewer` | PR / branch review in shakespeare voice |
+| `toronto-mans-reviewer` | PR / branch review in toronto-mans voice |
 | `dramaturg` | Meta-agent — audits persona rule-adherence |
+<!-- chrysippus:subagents-table END -->
 
-The five reviewers all do the same substantive work (code-review against
-a diff or branch); only the voice differs. The dramaturg is different in
-kind — it audits OTHER responses for drift and is intentionally plain-
-spoken itself.
+The per-persona reviewers all do the same substantive work (code-review
+against a diff or branch); only the voice differs. The dramaturg is
+different in kind — it audits OTHER responses for drift and is
+intentionally plain-spoken itself.
 
 ## How to invoke
 

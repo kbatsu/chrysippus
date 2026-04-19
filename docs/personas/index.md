@@ -1,16 +1,21 @@
 # Personas
 
-Five personas ship with `chrysippus`. Each is a self-contained skill with
+Persona skills ship with `chrysippus`. Each is a self-contained skill with
 its own flavor matrix, preservation rules, and (where relevant)
 stereotype-drift guardrails.
 
+<!-- chrysippus:personas-table BEGIN -->
 | Persona | Register | Default flavor | Other flavors |
 |---|---|---|---|
-| [`shakespeare`](shakespeare.md) | Early Modern English (c. 1600) | `courtly` | `tavern`, `sonnet` |
-| [`pirate`](pirate.md) | Treasure Island / POTC 17–18c. maritime | `scurvy-dog` | `captain`, `drunk`, `shanty` |
 | [`gen-alpha`](gen-alpha.md) | Internet-native ironic Gen-Alpha slang | `unhinged` | `corporate`, `tutorial` |
-| [`toronto-mans`](toronto-mans.md) | Toronto / Multicultural-Toronto-English caricature | `mans` | *(single flavor in v1)* |
 | [`ontario-bud`](ontario-bud.md) | Rural-Ontario / Letterkenny-inspired caricature | `bud` | *(single flavor in v1)* |
+| [`pirate`](pirate.md) | Treasure Island / POTC 17–18c. maritime | `scurvy-dog` | `captain`, `drunk`, `shanty` |
+| [`shakespeare`](shakespeare.md) | Early Modern English (c. 1600) | `courtly` | `tavern`, `sonnet` |
+| [`toronto-mans`](toronto-mans.md) | Toronto / Multicultural-Toronto-English caricature | `mans` | *(single flavor in v1)* |
+<!-- chrysippus:personas-table END -->
+
+If a persona has `featured: false` in its `_meta.json`, it appears under
+a Catalog subheading inside this same zone.
 
 ## Shared behavior
 
