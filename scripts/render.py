@@ -430,28 +430,71 @@ CONSUMER_MARKER_INJECTIONS = [
 ]
 
 
-def inject_consumer_markers(personas_meta, root):
+def _all_personas_meta():
+    """Always-load-everything: marker zones describe the WHOLE persona set,
+    independent of which subset the caller asked render to regenerate.
+
+    Returns a meta dict keyed by sorted persona name (matches the order
+    used everywhere else in the renderer for stability)."""
+    available = sorted(p.name for p in RULES_DIR.iterdir() if p.is_dir())
+    return {p: load_meta(p) for p in available}
+
+
+def inject_consumer_markers(personas_meta_unused, root):
     """Inject auto-generated content into the marker zones of consumer
-    files. Returns list of relative paths actually rewritten."""
+    files. Returns list of relative paths actually rewritten.
+
+    Note: `personas_meta_unused` is intentionally ignored — consumer
+    marker zones always describe the full persona set, never a subset.
+    This prevents `scripts/render.py shakespeare` from silently
+    corrupting README/docs/hooks tables to a 1-row table claiming only
+    shakespeare ships. The arg is kept for backward-compatible signature.
+
+    Errors from individual zone injections (missing marker pair, etc.)
+    are accumulated and raised together at the end, so a typo in one
+    file doesn't hide problems in the others.
+    """
+    del personas_meta_unused  # See docstring.
+    full_meta = _all_personas_meta()
     modified = []
+    errors = []
     for rel_path, marker_id, gen_fn in CONSUMER_MARKER_INJECTIONS:
         target = root / rel_path
         if not target.exists():
             # Consumer file may not exist when rendering to a fresh tmp.
             continue
-        content = gen_fn(personas_meta)
-        if inject_marker(target, marker_id, content):
-            modified.append(rel_path)
+        try:
+            content = gen_fn(full_meta)
+            if inject_marker(target, marker_id, content):
+                modified.append(rel_path)
+        except ValueError as e:
+            errors.append(f"  {rel_path}#{marker_id}: {e}")
+    if errors:
+        raise ValueError(
+            "marker injection failed for one or more zones:\n"
+            + "\n".join(errors)
+        )
     return modified
 
 
-def check_consumer_markers(personas_meta):
+def check_consumer_markers(personas_meta_unused):
     """Return list of drift descriptions for any consumer marker zone
     whose content does not match what its generator would produce.
 
     Operates on files at ROOT directly — these are not under
     MANAGED_OUTPUT_DIRS and are not rendered to the tmp out_root.
+
+    Distinguishes "marker pair missing" (structural — markers were
+    deleted from the file) from "content drifted" (markers exist but
+    their interior doesn't match what render would produce). The two
+    states need different fixes, so they get different error messages.
+
+    `personas_meta_unused` is ignored for the same reason as
+    inject_consumer_markers — checks always run against the full
+    persona set.
     """
+    del personas_meta_unused  # See docstring.
+    full_meta = _all_personas_meta()
     drifts = []
     for rel_path, marker_id, gen_fn in CONSUMER_MARKER_INJECTIONS:
         target = ROOT / rel_path
@@ -460,10 +503,21 @@ def check_consumer_markers(personas_meta):
                 f"  {rel_path}: marker target file is missing"
             )
             continue
-        expected = gen_fn(personas_meta)
+        # Detect "marker pair missing" structurally so the error message
+        # tells the user the right thing to do (add the markers vs
+        # re-render to refresh content).
+        present_ids = {mid for mid, _ in find_markers(target)}
+        if marker_id not in present_ids:
+            drifts.append(
+                f"  {rel_path}#{marker_id}: marker pair missing — "
+                f"add the BEGIN/END comment markers around the "
+                f"auto-rendered zone"
+            )
+            continue
+        expected = gen_fn(full_meta)
         if not check_marker(target, marker_id, expected):
             drifts.append(
-                f"  {rel_path}#{marker_id}: marker zone drifted "
+                f"  {rel_path}#{marker_id}: marker zone content drifted "
                 f"(re-run `scripts/render.py` to regenerate)"
             )
     return drifts
@@ -612,6 +666,17 @@ def _validate_meta(meta, persona):
         raise ValueError(
             f"rules/{persona}/_meta.json: 'register_short' must be a "
             f"non-empty string (got {meta['register_short']!r})"
+        )
+
+    # register_short is rendered into markdown table cells. Pipes break
+    # the column count, newlines break the row entirely, backticks would
+    # need balancing. Reject these to avoid silently-corrupted tables.
+    bad_chars = [c for c in ("|", "\n", "\r", "`") if c in meta["register_short"]]
+    if bad_chars:
+        raise ValueError(
+            f"rules/{persona}/_meta.json: 'register_short' contains "
+            f"table-breaking characters {bad_chars!r}; remove them "
+            f"(register_short is rendered into markdown table cells)"
         )
 
     flavors = meta["flavors"]

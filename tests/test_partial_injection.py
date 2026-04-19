@@ -317,6 +317,147 @@ class TestFeaturedFilter(unittest.TestCase):
                          ["b", "c", "d", "e"])
 
 
+class TestConsumerMarkerWiring(unittest.TestCase):
+    """Tests for the inject_consumer_markers / check_consumer_markers
+    wiring in scripts/render.py."""
+
+    def _setup_minimal_consumer_files(self, root):
+        """Create minimal consumer files at `root` with marker pairs that
+        match what's registered in CONSUMER_MARKER_INJECTIONS."""
+        from collections import defaultdict
+        per_file = defaultdict(set)
+        for rel_path, marker_id, _ in render.CONSUMER_MARKER_INJECTIONS:
+            per_file[rel_path].add(marker_id)
+        for rel_path, ids in per_file.items():
+            target = root / rel_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            suffix = Path(rel_path).suffix
+            begin_tmpl, end_tmpl = render.MARKER_FORMATS[suffix]
+            blocks = []
+            for mid in ids:
+                begin = begin_tmpl.format(id=mid)
+                end = end_tmpl.format(id=mid)
+                blocks.append(f"{begin}\nplaceholder\n{end}")
+            target.write_text("\n\n".join(blocks) + "\n", encoding="utf-8")
+
+    def test_subset_render_does_not_corrupt_consumer_markers(self):
+        """REGRESSION (C1): scripts/render.py shakespeare must not rewrite
+        consumer-file marker zones to a 1-row table claiming only
+        shakespeare ships. inject_consumer_markers must always render
+        with the FULL persona set, ignoring the caller's subset."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            self._setup_minimal_consumer_files(tmp_root)
+            # Caller passes a 1-element subset
+            one_persona = {"shakespeare": render.load_meta("shakespeare")}
+            render.inject_consumer_markers(one_persona, tmp_root)
+            # README's sibling-skills-table zone should contain ALL personas
+            readme = (tmp_root / "README.md").read_text(encoding="utf-8")
+            for persona in ("shakespeare", "pirate", "gen-alpha",
+                            "toronto-mans", "ontario-bud"):
+                with self.subTest(persona=persona):
+                    self.assertIn(
+                        persona, readme,
+                        f"README zone missing {persona!r} after subset render — "
+                        f"inject_consumer_markers should ignore the caller's "
+                        f"subset and always render the full persona set",
+                    )
+
+    def test_check_distinguishes_missing_marker_from_drift(self):
+        """REGRESSION (M2): when a marker pair is missing entirely (someone
+        deleted them), the error message must say 'marker pair missing'
+        not 'content drifted' — the two need different fixes."""
+        # We can't easily corrupt the live repo; instead test via
+        # find_markers + check_consumer_markers logic on a tmp file.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            (tmp_root / "README.md").write_text(
+                "no markers here\n", encoding="utf-8"
+            )
+            # Patch ROOT for the duration; check_consumer_markers reads
+            # from render.ROOT directly.
+            old_root = render.ROOT
+            render.ROOT = tmp_root
+            try:
+                drifts = render.check_consumer_markers({})
+            finally:
+                render.ROOT = old_root
+        # At least one drift entry should mention "marker pair missing"
+        # for README's sibling-skills-table (no markers in our tmp file).
+        missing_msgs = [d for d in drifts if "marker pair missing" in d]
+        self.assertTrue(
+            missing_msgs,
+            f"expected at least one 'marker pair missing' entry; got: {drifts}",
+        )
+
+    def test_inject_batches_errors_across_zones(self):
+        """REGRESSION (N1): an error in one zone shouldn't hide problems
+        in subsequent zones. inject_consumer_markers should attempt all
+        zones, accumulate errors, and raise once at the end with all
+        problems listed."""
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            # Touch every registered file but leave them empty (no markers).
+            seen_files = {rel for rel, _, _ in render.CONSUMER_MARKER_INJECTIONS}
+            for rel_path in seen_files:
+                target = tmp_root / rel_path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("no markers\n", encoding="utf-8")
+            with self.assertRaises(ValueError) as ctx:
+                render.inject_consumer_markers({}, tmp_root)
+            err = str(ctx.exception)
+            # All registered zones should be mentioned.
+            for rel_path, marker_id, _ in render.CONSUMER_MARKER_INJECTIONS:
+                with self.subTest(zone=f"{rel_path}#{marker_id}"):
+                    self.assertIn(
+                        f"{rel_path}#{marker_id}", err,
+                        f"batched error should mention every failing zone",
+                    )
+
+
+class TestRegistryValidity(unittest.TestCase):
+    """Every entry in CONSUMER_MARKER_INJECTIONS must be reachable: the
+    file must exist in the live repo, and the marker pair must be present
+    in it. Catches typo'd marker_ids and stale registry entries that
+    point at deleted files."""
+
+    def test_every_registered_file_exists(self):
+        for rel_path, marker_id, _ in render.CONSUMER_MARKER_INJECTIONS:
+            with self.subTest(file=rel_path):
+                self.assertTrue(
+                    (render.ROOT / rel_path).exists(),
+                    f"CONSUMER_MARKER_INJECTIONS lists {rel_path!r} but it "
+                    f"doesn't exist — fix the path or remove the entry",
+                )
+
+    def test_every_registered_marker_is_present_in_its_file(self):
+        for rel_path, marker_id, _ in render.CONSUMER_MARKER_INJECTIONS:
+            target = render.ROOT / rel_path
+            if not target.exists():
+                continue  # covered by previous test
+            present = {mid for mid, _ in render.find_markers(target)}
+            with self.subTest(file=rel_path, marker_id=marker_id):
+                self.assertIn(
+                    marker_id, present,
+                    f"CONSUMER_MARKER_INJECTIONS registers marker_id "
+                    f"{marker_id!r} for {rel_path}, but no such marker pair "
+                    f"is present in the file. Either add the markers or "
+                    f"remove the registry entry.",
+                )
+
+    def test_no_duplicate_file_marker_pairs(self):
+        seen = set()
+        for rel_path, marker_id, _ in render.CONSUMER_MARKER_INJECTIONS:
+            key = (rel_path, marker_id)
+            with self.subTest(key=key):
+                self.assertNotIn(
+                    key, seen,
+                    f"duplicate registry entry for ({rel_path!r}, "
+                    f"{marker_id!r}) — only the last one would take effect",
+                )
+                seen.add(key)
+
+
 class TestLoadMetaValidation(unittest.TestCase):
     """load_meta() validates _meta.json schema and fails loudly on
     contributor mistakes that would otherwise silently produce broken
@@ -396,6 +537,25 @@ class TestLoadMetaValidation(unittest.TestCase):
         self._assert_load_raises(
             lambda d: d.update(register_short="   "),
             "register_short",
+        )
+
+    def test_rejects_pipe_in_register_short(self):
+        """REGRESSION (M1): `|` would break markdown table column boundaries."""
+        self._assert_load_raises(
+            lambda d: d.update(register_short="bash | zsh | fish"),
+            "table-breaking",
+        )
+
+    def test_rejects_newline_in_register_short(self):
+        self._assert_load_raises(
+            lambda d: d.update(register_short="multi\nline"),
+            "table-breaking",
+        )
+
+    def test_rejects_backtick_in_register_short(self):
+        self._assert_load_raises(
+            lambda d: d.update(register_short="uses `code spans`"),
+            "table-breaking",
         )
 
     def test_rejects_no_default_flavor(self):
